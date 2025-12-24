@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using GanFramework.Core.Patterns;
 
-namespace Core
+namespace GanFramework.Core.UI
 {
     /// <summary>
     /// 单例UI管理者，控制UI的层级关系，UI的开关

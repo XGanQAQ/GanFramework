@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Core
+namespace GanFramework.Core.Event
 {
     /// <summary>
     /// 事件总线：用于解耦组件间的通信

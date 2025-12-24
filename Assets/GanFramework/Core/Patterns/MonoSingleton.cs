@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core
+namespace GanFramework.Core.Patterns
 {
     /// <summary>
     /// MonoBehavior抽象单例基类。确保继承类在场景中只有一个实例，并提供全局访问点。

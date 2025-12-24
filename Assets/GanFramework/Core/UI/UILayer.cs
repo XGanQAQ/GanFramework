@@ -1,4 +1,4 @@
-namespace Core
+namespace GanFramework.Core.UI
 {
     public enum UILayer
     {

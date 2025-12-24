@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-namespace Core
+namespace GanFramework.Core.UI
 {
     /// <summary>
     /// Base class for all UI components.

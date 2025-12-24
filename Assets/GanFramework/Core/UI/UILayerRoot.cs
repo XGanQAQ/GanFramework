@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
-namespace Core
+
+namespace GanFramework.Core.UI
 {
     // 挂在 NormalCanvas 上的脚本
     public class UILayerRoot : MonoBehaviour

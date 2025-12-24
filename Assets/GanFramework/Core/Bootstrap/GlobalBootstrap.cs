@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace Core
+namespace GanFramework.Core.Bootstrap
 {
     public static class GlobalBootstrap
     {

@@ -1,4 +1,4 @@
-namespace Core
+namespace GanFramework.Core.StateMachine
 {
     public interface IFSMState
     {

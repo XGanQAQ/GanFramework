@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Core
+namespace GanFramework.Core.Patterns
 {
     /// <summary>
     /// 持久化单例基类，确保继承类在场景中只有一个实例，并在场景切换时保持存在。
