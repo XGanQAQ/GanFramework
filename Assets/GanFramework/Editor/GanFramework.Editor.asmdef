@@ -1,0 +1,16 @@
+{
+    "name": "GanFramework.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:50f3f0abf52f9e947854e55e644237b4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
