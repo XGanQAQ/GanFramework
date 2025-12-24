@@ -30,7 +30,7 @@ namespace GanFramework.Core.DataPipeline
                 // 自动查找路径
                 if (string.IsNullOrEmpty(relativePath))
                     relativePath = FindRelativePath<T>();
-                // 拼接完整 StreamingAssets 路径（自动选择 .json / .fink）
+                // 拼接完整 StreamingAssets 路径（自动选择 .json / .gan）
                 string fullPath = BuildFullPath(Application.streamingAssetsPath, relativePath, GlobalSettingsRuntimeLoader.Current.CurrentDataLoadMode == EnvironmentState.DataLoadMode.Json
                     ? ".json"
                     : GlobalSettingsRuntimeLoader.Current.EncryptedExtension);
@@ -66,7 +66,7 @@ namespace GanFramework.Core.DataPipeline
                     return default;
                 // 如果本地不存在 → 自动复制默认文件（根据 JSON/Binary 模式）
                 EnsureLocalFileExists(relativePath);
-                // 拼接 PersistentDataPath 完整路径（自动补 .json 或 .fink 后缀）
+                // 拼接 PersistentDataPath 完整路径（自动补 .json 或 .gan 后缀）
                 string fullPath = BuildFullPath(Application.persistentDataPath, relativePath,GlobalSettingsRuntimeLoader.Current.CurrentDataLoadMode == EnvironmentState.DataLoadMode.Json
                     ? ".json"
                     : GlobalSettingsRuntimeLoader.Current.EncryptedExtension);
@@ -104,7 +104,7 @@ namespace GanFramework.Core.DataPipeline
                     LogUtil.Warn("FilesUtil", $"未找到类型 {typeof(T).Name} 对应的文件路径，保存失败。");
                     return;
                 }
-                // 构造最终保存路径（根据数据源模式自动附加 .json / .fink）
+                // 构造最终保存路径（根据数据源模式自动附加 .json / .gan）
                 string fullPath = BuildFullPath(Application.persistentDataPath, relativePath,GlobalSettingsRuntimeLoader.Current.CurrentDataLoadMode == EnvironmentState.DataLoadMode.Json
                     ? ".json"
                     : GlobalSettingsRuntimeLoader.Current.EncryptedExtension);
@@ -196,8 +196,8 @@ namespace GanFramework.Core.DataPipeline
             // 搜索目录：Binary 优先，Json 兜底
             string[] folders =
             {
-                "FinkFramework_Data/DataBinary",
-                "FinkFramework_Data/DataJson"
+                "GanFramework_Data/DataBinary",
+                "GanFramework_Data/DataJson"
             };
 
             // 搜索扩展名：加密后缀优先，其次 json

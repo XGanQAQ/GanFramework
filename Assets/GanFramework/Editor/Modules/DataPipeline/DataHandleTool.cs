@@ -11,9 +11,9 @@ namespace GanFramework.Editor.Modules.DataPipeline
     /// </summary>
     public static class DataHandleTool
     {
-        private const string KEY_STATE = "Fink_HandleState";      // 存储最终状态
-        private const string KEY_STAGE = "Fink_HandleStage";      // 当前阶段标志
-        private const string KEY_GEN_RESULT = "Fink_GenResult";   // 生成阶段记录
+        private const string KEY_STATE = "Gan_HandleState";      // 存储最终状态
+        private const string KEY_STAGE = "Gan_HandleStage";      // 当前阶段标志
+        private const string KEY_GEN_RESULT = "Gan_GenResult";   // 生成阶段记录
 
         [Serializable]
         private class HandleState

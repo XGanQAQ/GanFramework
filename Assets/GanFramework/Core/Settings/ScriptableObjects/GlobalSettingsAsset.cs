@@ -52,7 +52,7 @@ namespace GanFramework.Core.Settings.ScriptableObjects
         public EnvironmentState.DataLoadMode CurrentDataLoadMode = EnvironmentState.DataLoadMode.Binary;
 
         [Header("C# 数据类路径模式")]
-        [Tooltip("若为 false → C# 类生成在 Assets 内部；若为 true → 生成在 FinkFramework_Data 根目录")]
+        [Tooltip("若为 false → C# 类生成在 Assets 内部；若为 true → 生成在 GanFramework_Data 根目录")]
         public bool CSharpUseExternal = false;
 
         #endregion
@@ -101,7 +101,7 @@ namespace GanFramework.Core.Settings.ScriptableObjects
 
             if (guids.Length > 1)
             {
-                LogUtil.Error("FinkFramework","检测到多个 GlobalSettingsAsset，框架只允许存在一个全局设置的 SO 文件！");
+                LogUtil.Error("GanFramework","检测到多个 GlobalSettingsAsset，框架只允许存在一个全局设置的 SO 文件！");
 
                 // 高级：可以自动删除重复的，但为了安全不建议立即删除
             }

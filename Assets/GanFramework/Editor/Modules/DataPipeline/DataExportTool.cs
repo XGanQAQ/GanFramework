@@ -30,7 +30,7 @@ namespace GanFramework.Editor.Modules.DataPipeline
         /// </summary>
         public static (int success, int total) ExportAllData(bool silent = false)
         {
-            // 原始数据源目录 表格放置位置：项目根目录/FinkFramework_Data/DataTables
+            // 原始数据源目录 表格放置位置：项目根目录/GanFramework_Data/DataTables
             string sourceRoot = DataPipelinePath.ExcelRoot;
             
             // 清理旧加密目录 只清理 StreamingAssets 下旧加密文件

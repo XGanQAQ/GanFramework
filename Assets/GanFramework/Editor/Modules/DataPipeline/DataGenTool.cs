@@ -127,7 +127,7 @@ namespace GanFramework.Editor.Modules.DataPipeline
                     // 内部输出 → 写 EditorPrefs 用于编译后再打印
                     string summary1 = $"部分数据生成失败！状态: {successCount}/{totalCount}";
                     string summary2 = $"数据文件生成完成！状态: {successCount}/{totalCount}";
-                    EditorPrefs.SetString("Fink_LastGenResult", successCount != totalCount ? summary1 : summary2);
+                    EditorPrefs.SetString("Gan_LastGenResult", successCount != totalCount ? summary1 : summary2);
                 }
                 else
                 {
@@ -173,10 +173,10 @@ namespace GanFramework.Editor.Modules.DataPipeline
             string className = TextsUtil.ToPascalCase(fileName);
             
             // ---------- 2. 读取模板 ----------
-            var templateAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/FinkFramework/Editor/EditorResources/Data/template_data.txt");
+            var templateAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/GanFramework/Editor/EditorResources/Data/template_data.txt");
             if (!templateAsset)
             {
-                LogUtil.Error("DataGenTool", "未找到模板文件：Assets/FinkFramework/Editor/EditorResources/Data/template_data.txt");
+                LogUtil.Error("DataGenTool", "未找到模板文件：Assets/GanFramework/Editor/EditorResources/Data/template_data.txt");
             }
             string? template = templateAsset?.text;
 
@@ -263,10 +263,10 @@ namespace GanFramework.Editor.Modules.DataPipeline
 
         private static void GenerateContainerClass(ExcelMeta meta)
         {
-            var templateAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/FinkFramework/Editor/EditorResources/Data/template_container.txt");
+            var templateAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/GanFramework/Editor/EditorResources/Data/template_container.txt");
             if (!templateAsset)
             {
-                LogUtil.Error("DataGenTool", "未找到模板文件：Assets/FinkFramework/Editor/EditorResources/Data/template_container.txt");
+                LogUtil.Error("DataGenTool", "未找到模板文件：Assets/GanFramework/Editor/EditorResources/Data/template_container.txt");
                 return;
             }
             string className  = meta.ClassName;
@@ -308,10 +308,10 @@ namespace GanFramework.Editor.Modules.DataPipeline
         [InitializeOnLoadMethod]
         private static void DataGenToolLogger()
         {
-            string msg = EditorPrefs.GetString("Fink_LastGenResult", "");
+            string msg = EditorPrefs.GetString("Gan_LastGenResult", "");
             if (!string.IsNullOrEmpty(msg) && !EditorApplication.isCompiling)
             {
-                EditorPrefs.DeleteKey("Fink_LastGenResult");
+                EditorPrefs.DeleteKey("Gan_LastGenResult");
                 if (msg.Contains("失败"))
                 {
                     LogUtil.Error("DataGenTool", msg);

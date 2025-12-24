@@ -49,7 +49,7 @@ namespace GanFramework.Editor.Utils
         private bool IsIgnored(string path)
         {
             // 排除框架自身
-            if (path.StartsWith("Assets/FinkFramework"))
+            if (path.StartsWith("Assets/GanFramework"))
                 return true;
 
             // 可扩展 ignore 列表
@@ -64,7 +64,7 @@ namespace GanFramework.Editor.Utils
                 "editor:// 仅用于编辑器环境，不能出现在构建包内。\n" +
                 "请将该路径替换为：res:// 或 ab:// 或自定义 Provider。\n" +
                 "如需临时跳过此检测，可在 Project Settings 中关闭：\n" +
-                "【Project Settings → Fink Framework → 环境配置 → 启用 编辑器加载 打包检测】\n";
+                "【Project Settings → Gan Framework → 环境配置 → 启用 编辑器加载 打包检测】\n";
 
             throw new BuildFailedException(msg);
         }

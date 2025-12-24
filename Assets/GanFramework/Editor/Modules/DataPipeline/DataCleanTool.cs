@@ -14,9 +14,9 @@ namespace GanFramework.Editor.Modules.DataPipeline
         /// </summary>
         public static void ClearExportedData()
         {
-            string persistentPath = Path.Combine(Application.persistentDataPath, "FinkFramework_Data");
-            string streamingPath = Path.Combine(Application.streamingAssetsPath, "FinkFramework_Data");
-            string externalDataPath =  Path.Combine(DataPipelinePath.ProjectRoot, "FinkFramework_Data/AutoExport");
+            string persistentPath = Path.Combine(Application.persistentDataPath, "GanFramework_Data");
+            string streamingPath = Path.Combine(Application.streamingAssetsPath, "GanFramework_Data");
+            string externalDataPath =  Path.Combine(DataPipelinePath.ProjectRoot, "GanFramework_Data/AutoExport");
             try
             {
                 void SafeDelete(string path)
