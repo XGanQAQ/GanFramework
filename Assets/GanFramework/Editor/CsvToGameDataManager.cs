@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using GanFramework.Core.Data;
 using System.IO;
-using System.Collections.Generic;
 using UnityEditor;
 
 namespace GanFramework.Editor
