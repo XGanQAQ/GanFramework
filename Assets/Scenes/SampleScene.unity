@@ -455,6 +455,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c28e13802fbf534b8957190e821b489, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player:
+    Name: player1
+    Hp: 100
+    Speed: 0
 --- !u!4 &1443515347
 Transform:
   m_ObjectHideFlags: 0

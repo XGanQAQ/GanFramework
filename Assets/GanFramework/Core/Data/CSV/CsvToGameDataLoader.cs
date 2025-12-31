@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GanFramework.Core.Data
+namespace GanFramework.Core.Data.CSV
 {
     public class CsvToGameDataLoader<T>
     {

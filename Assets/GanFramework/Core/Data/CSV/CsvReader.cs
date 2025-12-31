@@ -1,4 +1,4 @@
-namespace GanFramework.Core.Data
+namespace GanFramework.Core.Data.CSV
 {
     // 简单的CSV读取器
     // lineIndex = 0表示第一行（头部行）
