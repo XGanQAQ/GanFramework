@@ -1,101 +1,96 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UI;
 using GanFramework.Core.Patterns;
 
 namespace GanFramework.Core.UI
 {
-    /// <summary>
-    /// 单例UI管理者，控制UI的层级关系，UI的开关
-    /// </summary>
-    public class UIManager : PersistentSingleton<UIManager>
+    // UI管理器，负责管理所有UI的打开、关闭和层级关系
+    public class UIManager : GlobalMonoSingleton<UIManager>, IUIManager
     {
-        public bool IsHasBackgroundUIActive
+        // 检测是否应该锁定鼠标
+        public bool IsShouldLockCursor()
         {
-            get
+            foreach (var layer in unLockedCursorLayers)
             {
-                return openedUIs.Values.Any(ui =>
-                    ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Background]);
-            }
-        }
-
-        public bool IsHasNormalUIActive
-        {
-            get
-            {
-                return openedUIs.Values.Any(ui =>
-                    ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Normal]);
-            }
-        }
-
-        public bool IsHasPopupUIActive
-        {
-            get
-            {
-                return openedUIs.Values.Any(ui =>
-                    ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Popup]);
-            }
-        }
-
-        public bool IsHasTopUIActive
-        {
-            get
-            {
-                return openedUIs.Values.Any(ui =>
-                    ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Top]);
-            }
-        }
-
-        private Dictionary<UILayer, Transform> layerRoots = new Dictionary<UILayer, Transform>();
-        private Dictionary<string, UIBase> openedUIs = new Dictionary<string, UIBase>();
-
-        public void RegisterLayer(UILayer layer, Transform root)
-        {
-            if (!layerRoots.ContainsKey(layer))
-            {
-                layerRoots[layer] = root;
-
-                // 注册场景中已存在的UI
-                // 遍历子对象
-                foreach (Transform child in root)
+                if (IsLayerHasUIActive(layer))
                 {
-                    var uiName = child.gameObject.name;
-                    UIBase uiBase = child.GetComponent<UIBase>();
-                    if (uiBase != null && !openedUIs.ContainsKey(uiName))
-                    {
-                        openedUIs[uiName] = uiBase;
-                    }
+                    return false;
                 }
             }
+
+            return true;
         }
 
-        public void UnRegisterLayer(UILayer layer)
+        // 检测某个层级下是否有UI处于激活状态
+        public bool IsLayerHasUIActive(UILayer layer)
         {
-            // 先移除该层级下的UI注册
-            var uiToRemove = openedUIs.Values.Where(ui => ui.transform.parent == layerRoots[layer]).ToList();
-            foreach (var ui in uiToRemove)
-            {
-                openedUIs.Remove(ui.gameObject.name);
-            }
-
-            // 然后移除层级根节点
-            if (layerRoots.ContainsKey(layer))
-            {
-                layerRoots.Remove(layer);
-            }
+            return layerRoots.FirstOrDefault(lr => lr.layer == layer)?.IsHasUIActive ?? false;
         }
-
-        public T OpenUI<T>(UILayer layer = UILayer.Normal) where T : Component
+        
+        // 检查某个UI是否处于激活状态
+        public bool IsUIActive<T>() where T : Component
         {
             string uiName = typeof(T).Name;
-            if (openedUIs.ContainsKey(uiName))
+            var viewerBase = GetViewer(uiName);
+            return viewerBase != null && viewerBase.IsActive;
+        }
+
+        // 允许解锁鼠标的UI层级
+        [SerializeField] private List<UILayer> unLockedCursorLayers = new List<UILayer>
+        {
+            UILayer.Popup,
+            UILayer.Top
+        };
+        
+        // 所有注册的UI层级根节点
+        public List<UILayerCanvas> layerRoots;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            layerRoots = new List<UILayerCanvas>();
+        }
+
+        // 注册层级根节点, 提供给UILayerCanvas调用
+        public void RegisterLayer(UILayerCanvas uiLayerCanvas)
+        {
+            if (!layerRoots.Contains(uiLayerCanvas))
             {
-                openedUIs[uiName].Show();
-                UpdateCursorState();
-                return openedUIs[uiName] as T;
+                layerRoots.Add(uiLayerCanvas);
+            }
+            else
+            {
+                Debug.LogError("UILayerRoot " + uiLayerCanvas.name + " is already registered.");
+            }
+        }
+
+        // 注销层级根节点, 提供给UILayerCanvas调用
+        public void UnRegisterLayer(UILayerCanvas uiLayerCanvas)
+        {
+            // 然后移除层级根节点
+            if (layerRoots.Contains(uiLayerCanvas))
+            {
+                layerRoots.Remove(uiLayerCanvas);
+            }
+        }
+
+        // 打开UI
+        // 若UI已打开则直接返回该UI实例
+        // 若UI未打开则加载预制体并实例化
+        public T OpenUI<T>() where T : Component
+        {
+            string uiName = typeof(T).Name;
+            ViewerBase viewerBase = null;
+            viewerBase = GetViewer(uiName);
+            if (viewerBase != null)
+            {
+                viewerBase.Open();
+                return viewerBase as T;
             }
 
+            // 若未打开则加载并实例化
             // 加载UI预制体
             GameObject prefab = Resources.Load<GameObject>("UI/" + uiName); // 从 Resources/UI 文件夹加载UI预制体
             if (prefab == null)
@@ -104,87 +99,71 @@ namespace GanFramework.Core.UI
                 return null;
             }
 
-            GameObject uiObj = Instantiate(prefab, layerRoots[layer]); // 实例化并设置父对象
-            UIBase uiBase = uiObj.GetComponent<UIBase>(); // 获取UIBase组件
-            openedUIs[uiName] = uiBase; // 注册到字典中
-            uiBase.Show(); // 显示UI
+            // 检测UI预制体是否有UIBase组件
+            var prefabUIBase = prefab.GetComponent<ViewerBase>();
+            if (prefabUIBase == null)
+            {
+                Debug.LogError("UI Prefab does not have UIBase component: " + uiName);
+                return null;
+            }
+
+            // 获取UI层级
+            UILayer layer = prefabUIBase.GetComponent<ViewerBase>().Layer;
+
+            // 确保层级根节点已注册,不存在则自己生成
+            UILayerCanvas targetLayerCanvas = layerRoots.FirstOrDefault(lr => lr.layer == layer);
+            if (targetLayerCanvas == null)
+            {
+                GameObject layerRootObj = new GameObject(layer.ToString() + "_Auto");
+                layerRootObj.AddComponent<Canvas>();
+                layerRootObj.AddComponent<CanvasScaler>();
+                layerRootObj.AddComponent<CanvasRenderer>();
+                layerRootObj.AddComponent<GraphicRaycaster>();
+                targetLayerCanvas = layerRootObj.AddComponent<UILayerCanvas>();
+                targetLayerCanvas.layer = layer;
+                layerRoots.Add(targetLayerCanvas);
+            }
+
+            // 实例化UI
+            GameObject uiObj = Instantiate(prefab, targetLayerCanvas.gameObject.transform); // 实例化
+            viewerBase = uiObj.GetComponent<ViewerBase>(); // 获取UIBase组件
+            viewerBase.Init(); // 初始化UI
+            targetLayerCanvas.UIBasesDic.TryAdd(viewerBase.name, viewerBase); // 注册UI到层级根节点
+
+            viewerBase.Open(); // 显示UI
             UpdateCursorState(); // 更新鼠标状态
-            return uiBase as T;
+            return viewerBase as T;
         }
 
+        // 关闭UI
+        // 若UI未打开则不做任何操作
+        // UI类名与Hierarchy中的UI对象名必须一致
         public void CloseUI<T>() where T : Component
         {
             string uiName = typeof(T).Name;
-            if (openedUIs.ContainsKey(uiName))
-            {
-                openedUIs[uiName].Hide();
-                UpdateCursorState();
-            }
-        }
-
-        public void ClosePopupUI()
-        {
-            var popupUIs = openedUIs.Values.Where(ui =>
-                ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Popup]);
-            foreach (var ui in popupUIs)
-            {
-                ui.Hide();
-            }
-
+            // 遍历所有LayerRoot，查找并关闭该UI
+            GetViewer(uiName)?.Close();
             UpdateCursorState();
         }
 
-        public void CloseTopUI()
+        // 根据UI名称在所有层级中查找UI实例
+        private ViewerBase GetViewer(string viewerName)
         {
-            var topUIs = openedUIs.Values.Where(ui =>
-                ui.gameObject.activeSelf && ui.transform.parent == layerRoots[UILayer.Top]);
-            foreach (var ui in topUIs)
+            foreach (var layerRoot in layerRoots)
             {
-                ui.Hide();
-            }
-
-            UpdateCursorState();
-        }
-
-        // 来回切换UI状态，按同一个键实现UI的开关
-        public void SwitchUI<T>(UILayer layer = UILayer.Normal) where T : Component
-        {
-            string uiName = typeof(T).Name;
-            if (openedUIs.ContainsKey(uiName) && openedUIs[uiName].gameObject.activeSelf)
-            {
-                CloseUI<T>();
-            }
-            else
-            {
-                OpenUI<T>(layer);
-            }
-        }
-
-        public Dictionary<UILayer, List<GameObject>> GetExistingUIsByLayer()
-        {
-            var result = new Dictionary<UILayer, List<GameObject>>();
-            foreach (var kvp in layerRoots)
-            {
-                var layer = kvp.Key;
-                var root = kvp.Value;
-                var uiList = new List<GameObject>();
-                foreach (Transform child in root)
+                if (layerRoot.UIBasesDic.TryGetValue(viewerName, out ViewerBase existingUI))
                 {
-                    UIBase uiBase = child.GetComponent<UIBase>();
-                    if (uiBase != null)
-                        uiList.Add(uiBase.gameObject);
+                    return existingUI;
                 }
-
-                result[layer] = uiList;
             }
 
-            return result;
+            return null;
         }
 
-
-        private void UpdateCursorState()
+        // 根据当前UI状态更新鼠标锁定状态
+        public void UpdateCursorState()
         {
-            bool shouldLockCursor = !(IsHasPopupUIActive || IsHasTopUIActive); 
+            bool shouldLockCursor = IsShouldLockCursor();
             Cursor.lockState = shouldLockCursor ? CursorLockMode.Locked : CursorLockMode.None;
         }
     }
