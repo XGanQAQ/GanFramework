@@ -14,6 +14,12 @@ namespace GanFramework.Editor
         public static void SyncAddressablesMacro()
         {
             var envState = Environment.State;
+            if (envState == null)
+            {
+                UnityEngine.Debug.LogWarning("Environment.State 未初始化，跳过宏同步。");
+                return;
+            }
+
             var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
 
             if (envState.EnableAddressables && !symbols.Contains("ENABLE_ADDRESSABLES"))
