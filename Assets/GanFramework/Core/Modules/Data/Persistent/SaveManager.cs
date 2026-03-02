@@ -9,7 +9,6 @@ namespace GanFramework.Core.Data.Persistent
     {
         OdinBinary,
         OdinJson,
-        NetJson,
     }
 
     /// <summary>
@@ -24,8 +23,6 @@ namespace GanFramework.Core.Data.Persistent
         {
             switch (format)
             {
-                case SaveFormat.NetJson:
-                    return new JsonNetSerializer();
                 case SaveFormat.OdinBinary:
                     return new OdinSerializer(DataFormat.Binary);
                 case SaveFormat.OdinJson:
@@ -59,13 +56,13 @@ namespace GanFramework.Core.Data.Persistent
             return SaveStore.Load<T>(serializer);
         }
 
-        public static bool Exists<T>(SaveFormat format = SaveFormat.NetJson)
+        public static bool Exists<T>(SaveFormat format = SaveFormat.OdinBinary)
         {
             var serializer = GetSerializerForFormat(format);
             return SaveStore.Exists<T>(serializer);
         }
 
-        public static void Delete<T>(SaveFormat format = SaveFormat.NetJson)
+        public static void Delete<T>(SaveFormat format = SaveFormat.OdinBinary)
         {
             var serializer = GetSerializerForFormat(format);
             SaveStore.Delete<T>(serializer);

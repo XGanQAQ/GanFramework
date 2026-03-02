@@ -14,7 +14,7 @@ namespace GanFramework.Editor.Data
         private TestSaveData data = new TestSaveData();
         private string log = "";
         // Selected save format for testing (shown in the dropdown)
-        private SaveFormat selectedFormat = SaveFormat.NetJson;
+        private SaveFormat selectedFormat = SaveFormat.OdinBinary;
 
         [MenuItem("GanFramework/Test/Save Test Window")]
         public static void ShowWindow()
@@ -160,9 +160,6 @@ namespace GanFramework.Editor.Data
             string ext;
             switch (format)
             {
-                case SaveFormat.NetJson:
-                    ext = ".json";
-                    break;
                 case SaveFormat.OdinJson:
                     ext = ".json";
                     break;
