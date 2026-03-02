@@ -31,7 +31,7 @@ namespace GanFramework.Core.Data.Persistent
                     throw new ArgumentOutOfRangeException(nameof(format), format, null);
             }
         }
-        
+
         #region Sync APIs
 
         public static void Save<T>(T data, SaveFormat format)
@@ -96,6 +96,12 @@ namespace GanFramework.Core.Data.Persistent
             LoadMembersInto(instance, format, null);
         }
 
+        /// <summary>
+        /// 将保存的数据加载到现有实例的成员中，而不是创建新实例。
+        /// </summary> 
+        /// <param name="instance">要加载数据的现有实例</param> 
+        /// <param name="format">保存格式</param> 
+        /// <param name="serializer">可选的序列化器，如果为 null 则根据 format 获取默认序列化器</param>
         public static void LoadMembersInto<T>(T instance, SaveFormat format, ISerializer serializer)
         {
             serializer ??= GetSerializerForFormat(format);
@@ -105,8 +111,6 @@ namespace GanFramework.Core.Data.Persistent
         #endregion
 
         #region Async APIs
-
-// ----------------- Async APIs -----------------
         public static Task SaveAsync<T>(T data, SaveFormat format)
         {
             return SaveAsync(data, format, null);
@@ -157,6 +161,12 @@ namespace GanFramework.Core.Data.Persistent
             return LoadMembersIntoAsync(instance, format, null);
         }
 
+        /// <summary>
+        /// 将保存的数据加载到现有实例的成员中，而不是创建新实例。
+        /// </summary>
+        /// <param name="instance">要加载数据的现有实例</param>
+        /// <param name="format">保存格式</param>
+        /// <param name="serializer">可选的序列化器，如果为 null 则根据 format 获取默认序列化器</param>
         public static Task LoadMembersIntoAsync<T>(T instance, SaveFormat format, ISerializer serializer)
         {
             serializer ??= GetSerializerForFormat(format);

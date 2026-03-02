@@ -6,11 +6,6 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-
 namespace GanFramework.Core.Data.Persistent
 {
     internal static class SaveStoreUtils
