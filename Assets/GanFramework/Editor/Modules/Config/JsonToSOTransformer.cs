@@ -27,19 +27,81 @@ namespace GanFramework.Core.Data.Config
     {
         public static ScriptableObject CreateFromJson(string json, string assetPath = null)
         {
-            var j = JObject.Parse(json);
-            var typeToken = j["type"];
-            if (typeToken == null) throw new ArgumentException("JSON must contain top-level 'type'.");
+            // 为兼容数组和单个对象，解析为 JToken 并分派到相应的处理器
+            var token = JToken.Parse(json);
+            if (token.Type == JTokenType.Array)
+            {
+                var list = CreateFromJsonMany(json, null, assetPath, null);
+                return list.FirstOrDefault();
+            }
 
-            var type = ResolveType((string)typeToken);
-            if (type == null) throw new ArgumentException($"Type not found: {(string)typeToken}");
+            var j = token as JObject;
+            return CreateFromJObject(j, null, assetPath);
+        }
+
+        // 创建多个 ScriptableObject（当 json 为数组或需要以指定类型反序列化多个条目时使用）
+        public static List<ScriptableObject> CreateFromJsonMany(string json, Type overrideType = null, string outputFolder = null, string baseName = null)
+        {
+            var result = new List<ScriptableObject>();
+            var token = JToken.Parse(json);
+            if (token.Type != JTokenType.Array)
+            {
+                // 非数组则尝试单个对象
+                var so = CreateFromJObject(token as JObject, overrideType, outputFolder);
+                if (so != null) result.Add(so);
+                return result;
+            }
+
+            var arr = token as JArray;
+            for (int i = 0; i < arr.Count; i++)
+            {
+                var item = arr[i] as JObject;
+                if (item == null) continue;
+
+                // 生成文件名：尝试使用常见字段作为名称（id/name/profession），否则使用 baseName + index
+                string name = null;
+                if (item["id"] != null) name = item["id"].ToString();
+                else if (item["name"] != null) name = item["name"].ToString();
+                else if (item["profession"] != null) name = item["profession"].ToString();
+                else if (!string.IsNullOrEmpty(baseName)) name = baseName + "_" + i;
+                else name = "Item_" + i;
+
+                string assetPath = null;
+                if (!string.IsNullOrEmpty(outputFolder))
+                {
+                    assetPath = Path.Combine(outputFolder, name + ".asset").Replace("\\", "/");
+                    assetPath = AssetDatabase.GenerateUniqueAssetPath(assetPath);
+                }
+
+                var so = CreateFromJObject(item, overrideType, assetPath);
+                if (so != null) result.Add(so);
+            }
+
+            return result;
+        }
+
+        // 基于 JObject 创建单个 SO 的核心实现，支持 overrideType
+        static ScriptableObject CreateFromJObject(JObject j, Type overrideType = null, string assetPath = null)
+        {
+            if (j == null) return null;
+
+            Type type = null;
+            if (overrideType != null) type = overrideType;
+            else
+            {
+                var typeToken = j["type"];
+                if (typeToken == null) throw new ArgumentException("JSON object must contain 'type' when overrideType is not provided.");
+                type = ResolveType((string)typeToken);
+                if (type == null) throw new ArgumentException($"Type not found: {(string)typeToken}");
+            }
+
             if (!typeof(ScriptableObject).IsAssignableFrom(type)) throw new ArgumentException("Type must derive from ScriptableObject.");
 
             // 首先尝试使用 OdinSerializer (JSON 格式) 进行反序列化
             try
             {
                 ISerializer serializer = new OdinSerializer(Odin.OdinSerializer.DataFormat.JSON);
-                var bytes = Encoding.UTF8.GetBytes(json);
+                var bytes = Encoding.UTF8.GetBytes(j.ToString());
                 var deserializeMethod = typeof(OdinSerializer).GetMethod("Deserialize");
                 if (deserializeMethod != null && deserializeMethod.IsGenericMethodDefinition)
                 {
@@ -57,7 +119,6 @@ namespace GanFramework.Core.Data.Config
                         return desSo;
                     }
 
-                    // 如果 Odin 返回的是普通对象（非 Unity 引擎对象），创建 ScriptableObject 实例并拷贝字段
                     var so = (ScriptableObject)ScriptableObject.CreateInstance(type);
                     CopyValues(deserialized, so);
                     if (!string.IsNullOrEmpty(assetPath))
@@ -74,15 +135,13 @@ namespace GanFramework.Core.Data.Config
                 // 忽略 Odin 反序列化的错误，回退到原有的 JObject 解析逻辑
             }
 
-            // 回退：使用逐字段解析逻辑
             var soFallback = ScriptableObject.CreateInstance(type);
-            var fieldsToken = j["fields"] as JObject;
+            var fieldsToken = j["fields"] as JObject ?? j;
             if (fieldsToken != null) PopulateObject(soFallback, fieldsToken, assetPath);
 
             if (!string.IsNullOrEmpty(assetPath))
             {
                 AssetDatabase.CreateAsset(soFallback, assetPath);
-                // 如果有子资产已被创建，它们会被 AddObjectToAsset 在 PopulateObject 中处理
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }

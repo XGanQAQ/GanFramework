@@ -148,14 +148,12 @@ namespace GanFramework.Core.Data.Config
                 var path = AssetDatabase.GetAssetPath(singleJsonFile);
                 var json = File.ReadAllText(path);
                 var name = Path.GetFileNameWithoutExtension(path);
-                var targetAssetPath = Path.Combine(outFolderPath, name + ".asset").Replace("\\", "/");
-                targetAssetPath = AssetDatabase.GenerateUniqueAssetPath(targetAssetPath);
-                var so = JsonToSOTransformer.CreateFromJson(json, targetAssetPath);
-                if (so != null)
+                var created = JsonToSOTransformer.CreateFromJsonMany(json, targetType, outFolderPath, name);
+                if (created != null && created.Count > 0)
                 {
-                    Debug.Log($"Created: {targetAssetPath}");
+                    Debug.Log($"Created {created.Count} assets from {path}");
                     EditorUtility.FocusProjectWindow();
-                    Selection.activeObject = so;
+                    Selection.activeObject = created.First();
                 }
                 else
                 {
@@ -209,10 +207,8 @@ namespace GanFramework.Core.Data.Config
                     EditorUtility.DisplayProgressBar("Converting JSON", p, (float)i / jsonPaths.Count);
                     var json = File.ReadAllText(p);
                     var name = Path.GetFileNameWithoutExtension(p);
-                    var targetAssetPath = Path.Combine(outFolderPath, name + ".asset").Replace("\\", "/");
-                    targetAssetPath = AssetDatabase.GenerateUniqueAssetPath(targetAssetPath);
-                    var so = JsonToSOTransformer.CreateFromJson(json, targetAssetPath);
-                    if (so != null) count++;
+                    var created = JsonToSOTransformer.CreateFromJsonMany(json, targetType, outFolderPath, name);
+                    if (created != null) count += created.Count;
                 }
             }
             finally
@@ -247,10 +243,8 @@ namespace GanFramework.Core.Data.Config
                     EditorUtility.DisplayProgressBar("Converting JSON", p, (float)i / jsonPaths.Count);
                     var json = File.ReadAllText(p);
                     var name = Path.GetFileNameWithoutExtension(p);
-                    var targetAssetPath = Path.Combine(outFolder, name + ".asset").Replace("\\", "/");
-                    targetAssetPath = AssetDatabase.GenerateUniqueAssetPath(targetAssetPath);
-                    var so = JsonToSOTransformer.CreateFromJson(json, targetAssetPath);
-                    if (so != null) count++;
+                    var created = JsonToSOTransformer.CreateFromJsonMany(json, targetType, outFolder, name);
+                    if (created != null) count += created.Count;
                 }
             }
             finally
