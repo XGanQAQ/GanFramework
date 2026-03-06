@@ -4,13 +4,6 @@ using GanFramework.Odin.OdinSerializer;
 
 namespace GanFramework.Core.Data.Persistent
 {
-    // 保存格式枚举，定义了支持的保存格式类型
-    public enum SaveFormat
-    {
-        OdinBinary,
-        OdinJson,
-    }
-
     /// <summary>
     /// 保存入口：根据指定的保存格式（SaveFormat）选择对应的序列化器
     /// 并委托到底层的 SaveStore（其已被设计为支持可替换的序列化器）。
