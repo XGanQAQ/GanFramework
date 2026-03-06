@@ -18,6 +18,7 @@ namespace GanFramework.Core.Data.Config
         string[] soTypeKeys = new string[0];
         int selectedTypeIndex = 0;
         string assemblyFolderPath = string.Empty;
+        string savedSelectedTypeKey = null;
 
         bool useFolder = true;
 
@@ -31,7 +32,13 @@ namespace GanFramework.Core.Data.Config
 
         void OnEnable()
         {
+            LoadSettings();
             RefreshTypes();
+        }
+
+        void OnDisable()
+        {
+            SaveSettings();
         }
 
         void RefreshTypes()
@@ -45,8 +52,21 @@ namespace GanFramework.Core.Data.Config
             }
             else
             {
-                selectedTypeIndex = Mathf.Clamp(selectedTypeIndex, 0, soTypeKeys.Length - 1);
+                // if we previously saved a selected key, restore its index
+                if (!string.IsNullOrEmpty(savedSelectedTypeKey))
+                {
+                    var idx = Array.IndexOf(soTypeKeys, savedSelectedTypeKey);
+                    if (idx >= 0) selectedTypeIndex = idx;
+                    else selectedTypeIndex = Mathf.Clamp(selectedTypeIndex, 0, soTypeKeys.Length - 1);
+                }
+                else
+                {
+                    selectedTypeIndex = Mathf.Clamp(selectedTypeIndex, 0, soTypeKeys.Length - 1);
+                }
             }
+
+            // clear saved key after applying
+            savedSelectedTypeKey = null;
         }
 
         void OnGUI()
@@ -159,6 +179,45 @@ namespace GanFramework.Core.Data.Config
                 {
                     Debug.LogError($"Failed to create SO from {path}");
                 }
+            }
+        }
+
+        // --- Persist settings ---
+        const string PrefPrefix = "GanFramework.JsonToSO.";
+
+        void SaveSettings()
+        {
+            EditorPrefs.SetString(PrefPrefix + "assemblyFolderPath", assemblyFolderPath ?? "");
+            var srcPath = GetProjectPath(sourceFolder) ?? "";
+            var outPath = GetProjectPath(outputFolder) ?? "";
+            EditorPrefs.SetString(PrefPrefix + "sourceFolderPath", srcPath);
+            EditorPrefs.SetString(PrefPrefix + "outputFolderPath", outPath);
+            EditorPrefs.SetInt(PrefPrefix + "useFolder", useFolder ? 1 : 0);
+            // save selected type key if available
+            if (soTypeKeys != null && soTypeKeys.Length > 0 && selectedTypeIndex >= 0 && selectedTypeIndex < soTypeKeys.Length)
+                EditorPrefs.SetString(PrefPrefix + "selectedTypeKey", soTypeKeys[selectedTypeIndex]);
+            else
+                EditorPrefs.SetString(PrefPrefix + "selectedTypeKey", "");
+        }
+
+        void LoadSettings()
+        {
+            assemblyFolderPath = EditorPrefs.GetString(PrefPrefix + "assemblyFolderPath", assemblyFolderPath ?? "");
+            var src = EditorPrefs.GetString(PrefPrefix + "sourceFolderPath", "");
+            var outp = EditorPrefs.GetString(PrefPrefix + "outputFolderPath", "");
+            useFolder = EditorPrefs.GetInt(PrefPrefix + "useFolder", useFolder ? 1 : 0) == 1;
+            savedSelectedTypeKey = EditorPrefs.GetString(PrefPrefix + "selectedTypeKey", "");
+
+            if (!string.IsNullOrEmpty(src))
+            {
+                var a = AssetDatabase.LoadMainAssetAtPath(src);
+                if (a != null) sourceFolder = a;
+            }
+
+            if (!string.IsNullOrEmpty(outp))
+            {
+                var b = AssetDatabase.LoadMainAssetAtPath(outp);
+                if (b != null) outputFolder = b;
             }
         }
 
