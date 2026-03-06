@@ -10,6 +10,7 @@ using UnityEditor;
 
 namespace GanFramework.Editor.Config
 {
+    // 一个简单的Unity编辑器窗口，用于运行Luban的.bat文件并显示输出
     public class LubanRunnerWindow : EditorWindow
     {
         const string PrefKeyBatPath = "LubanEditor_BatPath";

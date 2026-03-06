@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace GanFramework.Editor.Config
 {
+    // 一个简单的Unity编辑器窗口，用于生成Luban的gen.bat文件
     public class LubanBatchGeneratorWindow : EditorWindow
     {
         const string PrefKeyBatPath = "LubanEditor_BatPath";
