@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using GanFramework.Core.Data;
 using GanFramework.Core.Data.Persistent;
 using UnityEditor;
 using UnityEngine;

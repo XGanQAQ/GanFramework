@@ -1,10 +1,14 @@
-// ...existing code...
+// JsonToSOTransformer: 使用 OdinSerializer 优先反序列化 JSON 为对象，失败时回退到 JObject 解析并生成 ScriptableObject
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using GanFramework.Core.Data;
+using System.Text;
+using System.IO;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -12,20 +16,11 @@ namespace GanFramework.Core.Data.Config
 {
     /// <summary>
     /// 通过任意类型的 JSON 生成 ScriptableObject 资源（不依赖具体类型）。
+    /// 支持优先使用 OdinSerializer(JSON) 反序列化为目标类型；若失败，则回退为逐字段解析并支持内联子 SO 与引用 assetPath 加载。
     /// JSON 格式示例:
     /// {
     ///   "type": "Namespace.MySO, AssemblyName",
-    ///   "fields": {
-    ///     "intField": 123,
-    ///     "stringField": "hello",
-    ///     "enumField": "EnumName",
-    ///     "refAsset": { "assetPath": "Assets/Path/To/Asset.asset" },
-    ///     "nestedSO": {
-    ///       "type": "Namespace.NestedSO, AssemblyName",
-    ///       "fields": { ... }
-    ///     },
-    ///     "listField": [1,2,3]
-    ///   }
+    ///   "fields": { ... }
     /// }
     /// </summary>
     public static class JsonToSOTransformer
@@ -40,27 +35,66 @@ namespace GanFramework.Core.Data.Config
             if (type == null) throw new ArgumentException($"Type not found: {(string)typeToken}");
             if (!typeof(ScriptableObject).IsAssignableFrom(type)) throw new ArgumentException("Type must derive from ScriptableObject.");
 
-            var so = ScriptableObject.CreateInstance(type);
+            // 首先尝试使用 OdinSerializer (JSON 格式) 进行反序列化
+            try
+            {
+                ISerializer serializer = new OdinSerializer(Odin.OdinSerializer.DataFormat.JSON);
+                var bytes = Encoding.UTF8.GetBytes(json);
+                var deserializeMethod = typeof(OdinSerializer).GetMethod("Deserialize");
+                if (deserializeMethod != null && deserializeMethod.IsGenericMethodDefinition)
+                {
+                    var generic = deserializeMethod.MakeGenericMethod(type);
+                    var deserialized = generic.Invoke(serializer, new object[] { bytes });
+
+                    if (deserialized is ScriptableObject desSo)
+                    {
+                        if (!string.IsNullOrEmpty(assetPath))
+                        {
+                            AssetDatabase.CreateAsset(desSo, assetPath);
+                            AssetDatabase.SaveAssets();
+                            AssetDatabase.Refresh();
+                        }
+                        return desSo;
+                    }
+
+                    // 如果 Odin 返回的是普通对象（非 Unity 引擎对象），创建 ScriptableObject 实例并拷贝字段
+                    var so = (ScriptableObject)ScriptableObject.CreateInstance(type);
+                    CopyValues(deserialized, so);
+                    if (!string.IsNullOrEmpty(assetPath))
+                    {
+                        AssetDatabase.CreateAsset(so, assetPath);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
+                    }
+                    return so;
+                }
+            }
+            catch
+            {
+                // 忽略 Odin 反序列化的错误，回退到原有的 JObject 解析逻辑
+            }
+
+            // 回退：使用逐字段解析逻辑
+            var soFallback = ScriptableObject.CreateInstance(type);
             var fieldsToken = j["fields"] as JObject;
-            if (fieldsToken != null) PopulateObject(so, fieldsToken, assetPath);
+            if (fieldsToken != null) PopulateObject(soFallback, fieldsToken, assetPath);
 
             if (!string.IsNullOrEmpty(assetPath))
             {
-                AssetDatabase.CreateAsset(so, assetPath);
+                AssetDatabase.CreateAsset(soFallback, assetPath);
                 // 如果有子资产已被创建，它们会被 AddObjectToAsset 在 PopulateObject 中处理
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
 
-            return so;
+            return soFallback;
         }
+
 
         static Type ResolveType(string name)
         {
-            // First try assembly-qualified
             var t = Type.GetType(name);
             if (t != null) return t;
-            // Otherwise search loaded assemblies
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 t = asm.GetType(name);
@@ -94,7 +128,6 @@ namespace GanFramework.Core.Data.Config
                     propInfo.SetValue(target, value, null);
                 }
 
-                // 如果有新建的子资产需要添加到同一个 asset 文件
                 if (createdSubAssets != null && !string.IsNullOrEmpty(parentAssetPath))
                 {
                     foreach (var sub in createdSubAssets)
@@ -111,7 +144,6 @@ namespace GanFramework.Core.Data.Config
 
             if (token == null || token.Type == JTokenType.Null) return null;
 
-            // UnityEngine.Object 引用 (用 assetPath 指定)
             if (typeof(UnityEngine.Object).IsAssignableFrom(targetType))
             {
                 if (token.Type == JTokenType.Object)
@@ -121,7 +153,6 @@ namespace GanFramework.Core.Data.Config
                     {
                         return AssetDatabase.LoadAssetAtPath(assetPath, targetType);
                     }
-                    // 内联生成 nested ScriptableObject 并作为子资产
                     var nestedTypeToken = token["type"];
                     if (nestedTypeToken != null)
                     {
@@ -137,7 +168,6 @@ namespace GanFramework.Core.Data.Config
                     }
                 }
 
-                // 尝试从 GUID 或 path 字符串加载
                 if (token.Type == JTokenType.String)
                 {
                     var path = (string)token;
@@ -146,7 +176,6 @@ namespace GanFramework.Core.Data.Config
                 }
             }
 
-            // 可枚举类型（数组 / List<T>）
             if (token.Type == JTokenType.Array && (targetType.IsArray || IsGenericList(targetType)))
             {
                 var elemType = targetType.IsArray ? targetType.GetElementType() : targetType.GetGenericArguments()[0];
@@ -178,7 +207,6 @@ namespace GanFramework.Core.Data.Config
                 }
             }
 
-            // 基本类型与枚举
             if (targetType.IsEnum)
             {
                 if (token.Type == JTokenType.String)
@@ -195,7 +223,6 @@ namespace GanFramework.Core.Data.Config
             if (targetType == typeof(short)) return token.ToObject<short>();
             if (targetType == typeof(byte)) return token.ToObject<byte>();
 
-            // 复杂对象：尝试构造并填充普通 POCO 或 ScriptableObject
             if (token.Type == JTokenType.Object)
             {
                 var obj = token as JObject;
@@ -230,7 +257,6 @@ namespace GanFramework.Core.Data.Config
                 }
             }
 
-            // 作为最后手段，尝试直接转换
             try
             {
                 return token.ToObject(targetType);
@@ -246,5 +272,106 @@ namespace GanFramework.Core.Data.Config
             return t.IsGenericType && (t.GetGenericTypeDefinition() == typeof(List<>)
                 || t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>)));
         }
+
+        static void CopyValues(object src, object dst)
+        {
+            if (src == null || dst == null) return;
+            var srcType = src.GetType();
+            var dstType = dst.GetType();
+
+            foreach (var sf in srcType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                var df = dstType.GetField(sf.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (df == null) continue;
+                var sval = sf.GetValue(src);
+                if (sval == null) { df.SetValue(dst, null); continue; }
+                if (df.FieldType.IsAssignableFrom(sf.FieldType)) df.SetValue(dst, sval);
+            }
+
+            foreach (var sp in srcType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (!sp.CanRead) continue;
+                var dp = dstType.GetProperty(sp.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (dp == null || !dp.CanWrite) continue;
+                var sval = sp.GetValue(src, null);
+                if (sval == null) { dp.SetValue(dst, null, null); continue; }
+                if (dp.PropertyType.IsAssignableFrom(sp.PropertyType)) dp.SetValue(dst, sval, null);
+            }
+        }
+
+        public static string SerializeToOdinJson(object obj)
+        {
+            var serializer = new OdinSerializer(Odin.OdinSerializer.DataFormat.JSON);
+            var bytes = ((ISerializer)serializer).Serialize(obj);
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        // 自动扫描所有 ScriptableObject 类型
+        // 如果提供 assemblyFolder，会尝试加载该文件夹下的 .dll 并一并扫描
+        public static Dictionary<string, Type> GetAllSOTypes(string asmdefFolder = null)
+        {
+            var soTypes = new Dictionary<string, Type>();
+            // 如果提供了 asmdef 文件夹，则读取 asmdef 并仅扫描这些 asmdef 对应的已编译程序集
+            if (!string.IsNullOrEmpty(asmdefFolder) && Directory.Exists(asmdefFolder))
+            {
+                try
+                {
+                    var asmdefFiles = Directory.GetFiles(asmdefFolder, "*.asmdef", SearchOption.AllDirectories);
+                    var asmNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var f in asmdefFiles)
+                    {
+                        try
+                        {
+                            var txt = File.ReadAllText(f);
+                            var jo = JObject.Parse(txt);
+                            var nameToken = jo["name"];
+                            if (nameToken != null)
+                            {
+                                var asmName = (string)nameToken;
+                                if (!string.IsNullOrEmpty(asmName)) asmNames.Add(asmName);
+                            }
+                        }
+                        catch { }
+                    }
+
+                    // project Library/ScriptAssemblies path
+                    string libDir = null;
+                    try { libDir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Library", "ScriptAssemblies")); } catch { libDir = null; }
+
+                    foreach (var asmName in asmNames)
+                    {
+                        // 先尝试在已加载 AppDomain 程序集中查找
+                        var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => string.Equals(a.GetName().Name, asmName, StringComparison.OrdinalIgnoreCase));
+                        if (asm == null && !string.IsNullOrEmpty(libDir))
+                        {
+                            var dllPath = Path.Combine(libDir, asmName + ".dll");
+                            if (File.Exists(dllPath))
+                            {
+                                try { asm = Assembly.LoadFrom(dllPath); } catch { asm = null; }
+                            }
+                        }
+
+                        if (asm == null) continue;
+
+                        try
+                        {
+                            var types = asm.GetTypes().Where(t => typeof(ScriptableObject).IsAssignableFrom(t) && !t.IsAbstract);
+                            foreach (var type in types)
+                            {
+                                string key = $"{type.FullName}, {type.Assembly.GetName().Name}";
+                                if (!soTypes.ContainsKey(key)) soTypes.Add(key, type);
+                            }
+                        }
+                        catch (ReflectionTypeLoadException) { }
+                        catch { }
+                    }
+                }
+                catch { }
+
+                return soTypes;
+            }
+            return soTypes;
+        }
     }
 }
+#endif

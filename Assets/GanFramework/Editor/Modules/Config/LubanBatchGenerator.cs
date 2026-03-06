@@ -13,7 +13,7 @@ namespace GanFramework.Editor.Config
     public class LubanBatchGenerator
     {
         public string workspace = ".."; // relative to project root
-        public string lubanDllRelative = "..\\Luban\\Luban.dll"; // relative to workspace
+        public string lubanDllRelative = ConfigPath.LubanDllRelative; // relative to workspace
         public string confRoot = ".";
         public string target = "all";
         public string config = "cs-simple-json";

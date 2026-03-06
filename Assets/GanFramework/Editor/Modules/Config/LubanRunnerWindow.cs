@@ -22,7 +22,7 @@ namespace GanFramework.Editor.Config
         Process runningProcess;
         Vector2 scrollPos;
 
-        [MenuItem("GanFramework/Luban Runner")]
+        [MenuItem("GanFramework/Config/Excel -> Json Runner")]
         public static void ShowWindow()
         {
             var w = GetWindow<LubanRunnerWindow>(false, "Luban Runner");

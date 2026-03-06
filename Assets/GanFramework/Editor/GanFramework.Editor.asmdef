@@ -2,7 +2,8 @@
     "name": "GanFramework.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:50f3f0abf52f9e947854e55e644237b4"
+        "GUID:50f3f0abf52f9e947854e55e644237b4",
+        "GUID:35bff18a6690063e5e902b85502aaf17"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
