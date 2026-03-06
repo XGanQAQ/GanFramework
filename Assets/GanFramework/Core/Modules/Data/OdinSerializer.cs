@@ -4,7 +4,7 @@ using System.Linq;
 using GanFramework.Odin.OdinSerializer;
 using GanFramework.Core.Data.Persistent.ReferenceResolver;
 
-namespace GanFramework.Core.Data.Persistent
+namespace GanFramework.Core.Data
 {
     // OdinSerializer 实现了 ISerializer 接口，使用 Odin Serializer 进行对象的序列化和反序列化。
     // 构造函数接受一个 DataFormat 参数来指定使用 JSON 还是二进制格式。

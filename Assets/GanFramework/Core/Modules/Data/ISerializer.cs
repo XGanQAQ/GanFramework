@@ -1,4 +1,4 @@
-namespace GanFramework.Core.Data.Persistent
+namespace GanFramework.Core.Data
 {
     /// <summary>
     /// 抽象序列化器，用于将对象序列化为字符串并从字符串反序列化回对象。

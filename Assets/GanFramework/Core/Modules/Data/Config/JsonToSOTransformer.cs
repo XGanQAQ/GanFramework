@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace GanFramework.Editor.Modules.Config
+namespace GanFramework.Core.Data.Config
 {
     /// <summary>
     /// 通过任意类型的 JSON 生成 ScriptableObject 资源（不依赖具体类型）。
