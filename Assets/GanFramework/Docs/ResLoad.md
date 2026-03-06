@@ -71,9 +71,3 @@ ResManager.Instance.UnloadAsset<Texture2D>("res://Textures/MyTex", isDel:true);
 - 核心：[Assets/GanFramework/Core/Modules/ResLoad/ResManager.cs](Assets/GanFramework/Core/Modules/ResLoad/ResManager.cs)
 - 基类与操作句柄：[Assets/GanFramework/Core/Modules/ResLoad/Base](Assets/GanFramework/Core/Modules/ResLoad/Base)
 - 后端实现：[Assets/GanFramework/Core/Modules/ResLoad/Providers](Assets/GanFramework/Core/Modules/ResLoad/Providers)
-
----
-若需要，我可以：
-- 生成一张加载/卸载时序图（Mermaid）；或
-- 在文档中补充更详细的示例（如音频/AssetBundle 的特殊行为、Addressables 配置示例）。
-请选择下一步。
