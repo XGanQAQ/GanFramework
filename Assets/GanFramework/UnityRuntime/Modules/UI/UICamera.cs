@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GanFramework.Runtime.UI
+namespace GanFramework.Runtime.Modules.UI
 {
     [RequireComponent(typeof(Camera))]
     public class UICamera : MonoBehaviour
@@ -26,7 +26,7 @@ namespace GanFramework.Runtime.UI
             else
                 Debug.LogWarning("[UICamera]: UI layer not found, please add a 'UI' layer in the project settings.");
             uiCamera.orthographic = false;
-            uiCamera.depth = 100; // 确保在主相机之后渲染
+            uiCamera.depth = 100;
         }
 
         private void OnDestroy()

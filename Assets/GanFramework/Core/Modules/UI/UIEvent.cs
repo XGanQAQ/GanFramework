@@ -1,22 +1,22 @@
 using GanFramework.Core.EventBus;
 
-namespace GanFramework.Runtime.UI
+namespace GanFramework.Core.Modules.UI
 {
     public class CloseUIEvent : IEvent
     {
-        public ViewerBase Viewer { get; set; }
+        public IViewer Viewer { get; set; }
 
-        public CloseUIEvent(ViewerBase viewer)
+        public CloseUIEvent(IViewer viewer)
         {
             Viewer = viewer;
         }
     }
-    
+
     public class OpenUIEvent : IEvent
     {
-        public ViewerBase Viewer { get; set; }
+        public IViewer Viewer { get; set; }
 
-        public OpenUIEvent(ViewerBase viewer)
+        public OpenUIEvent(IViewer viewer)
         {
             Viewer = viewer;
         }

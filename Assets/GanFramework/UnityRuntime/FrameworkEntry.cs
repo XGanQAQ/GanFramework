@@ -1,12 +1,12 @@
 using UnityEngine;
 using GanFramework.Core;
+using GanFramework.Runtime.Patterns;
 
 namespace GanFramework.Runtime
 {
-    public class FrameworkEntry : MonoBehaviour
+    public class FrameworkEntry : GlobalMonoSingleton<FrameworkEntry>
     {
         private static bool initialized = false;
-        private static FrameworkEntry instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
@@ -15,7 +15,6 @@ namespace GanFramework.Runtime
             initialized = true;
 
             var go = new GameObject("[FrameworkEntry]");
-            DontDestroyOnLoad(go);
             instance = go.AddComponent<FrameworkEntry>();
 
             Framework.Init();
@@ -36,11 +35,11 @@ namespace GanFramework.Runtime
             Framework.LateUpdate(Time.deltaTime);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Framework.Shutdown();
             initialized = false;
-            instance = null;
         }
     }
 }

@@ -1,11 +1,10 @@
-using System;
 using GanFramework.Core.EventBus;
-using GanFramework.Core.UI;
+using GanFramework.Core.Modules.UI;
 using UnityEngine;
 
-namespace GanFramework.Runtime.UI
+namespace GanFramework.Runtime.Modules.UI
 {
-    public abstract class PresenterBase<T> : MonoBehaviour, IInitializable where T : IEvent 
+    public abstract class PresenterBase<T> : MonoBehaviour, IPresenter where T : IEvent
     {
         public virtual void Init()
         {
