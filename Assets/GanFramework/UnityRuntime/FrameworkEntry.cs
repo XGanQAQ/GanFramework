@@ -1,23 +1,33 @@
 using UnityEngine;
 using GanFramework.Core;
-using GanFramework.Runtime.Patterns;
+using GanFramework.Core.EventBus;
+using GanFramework.Runtime.Data.Persistent;
 
 namespace GanFramework.Runtime
 {
-    public class FrameworkEntry : GlobalMonoSingleton<FrameworkEntry>
+    public class FrameworkEntry : MonoBehaviour
     {
-        private static bool initialized = false;
+        private static FrameworkEntry instance;
+
+        public static FrameworkEntry Instance => instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
         {
-            if (initialized) return;
-            initialized = true;
+            if (instance != null) return;
 
             var go = new GameObject("[FrameworkEntry]");
+            DontDestroyOnLoad(go);
             instance = go.AddComponent<FrameworkEntry>();
 
+            RegisterBuiltinModules();
             Framework.Init();
+        }
+
+        private static void RegisterBuiltinModules()
+        {
+            Framework.Register(new EventBus());
+            Framework.Register(new PersistentService());
         }
 
         private void Update()
@@ -35,11 +45,11 @@ namespace GanFramework.Runtime
             Framework.LateUpdate(Time.deltaTime);
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
+            if (instance != this) return;
             Framework.Shutdown();
-            initialized = false;
+            instance = null;
         }
     }
 }

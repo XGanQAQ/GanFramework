@@ -5,7 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
+using GanFramework.Core;
 using GanFramework.Core.Data.Persistent;
+using GanFramework.Odin.OdinSerializer;
 using GanFramework.Runtime.Data.Persistent;
 using UnityEditor;
 using UnityEngine;
@@ -40,7 +42,7 @@ namespace GanFramework.Editor.Data
             {
                 try
                 {
-                    SaveManager.Save(data, selectedFormat);
+                    Framework.GetModule<IPersistent>().Save(data, GetSerializer(selectedFormat));
                     log = "Save (sync) success";
                 }
                 catch (Exception ex)
@@ -53,7 +55,7 @@ namespace GanFramework.Editor.Data
             {
                 try
                 {
-                    var loaded = SaveManager.Load<TestSaveData>(selectedFormat);
+                    var loaded = Framework.GetModule<IPersistent>().Load<TestSaveData>(GetSerializer(selectedFormat));
                     if (loaded != null)
                     {
                         data = loaded;
@@ -74,7 +76,7 @@ namespace GanFramework.Editor.Data
             {
                 try
                 {
-                    SaveManager.SaveMembers(data, selectedFormat);
+                    Framework.GetModule<IPersistent>().SaveMembers(data, GetSerializer(selectedFormat));
                     log = "SaveMembers (sync) success";
                 }
                 catch (Exception ex)
@@ -87,7 +89,7 @@ namespace GanFramework.Editor.Data
             {
                 try
                 {
-                    var loaded = SaveManager.LoadMembers<TestSaveData>(selectedFormat);
+                    var loaded = Framework.GetModule<IPersistent>().LoadMembers<TestSaveData>(serializer: GetSerializer(selectedFormat));
                     if (loaded != null)
                     {
                         data = loaded;
@@ -156,6 +158,16 @@ namespace GanFramework.Editor.Data
         }
 
         // Return filename with extension matching the selected save format
+        private static ISerializer GetSerializer(SaveFormat format)
+        {
+            return format switch
+            {
+                SaveFormat.OdinBinary => new OdinSerializer(DataFormat.Binary),
+                SaveFormat.OdinJson => new OdinSerializer(DataFormat.JSON),
+                _ => new OdinSerializer(DataFormat.Binary),
+            };
+        }
+
         private static string GetFileNameForType(Type t, SaveFormat format)
         {
             var attr = t.GetCustomAttribute<SaveClassAttribute>();
@@ -181,7 +193,7 @@ namespace GanFramework.Editor.Data
         {
             try
             {
-                await SaveManager.SaveAsync(data, selectedFormat);
+                await Framework.GetModule<IPersistent>().SaveAsync(data, GetSerializer(selectedFormat));
                 log = "Save (async) success";
                 Repaint();
             }
@@ -196,7 +208,7 @@ namespace GanFramework.Editor.Data
         {
             try
             {
-                var loaded = await SaveManager.LoadAsync<TestSaveData>(selectedFormat);
+                var loaded = await Framework.GetModule<IPersistent>().LoadAsync<TestSaveData>(GetSerializer(selectedFormat));
                 if (loaded != null)
                 {
                     data = loaded;
@@ -219,7 +231,7 @@ namespace GanFramework.Editor.Data
         {
             try
             {
-                await SaveManager.SaveMembersAsync(data, selectedFormat);
+                await Framework.GetModule<IPersistent>().SaveMembersAsync(data, GetSerializer(selectedFormat));
                 log = "SaveMembers (async) success";
                 Repaint();
             }
@@ -234,7 +246,7 @@ namespace GanFramework.Editor.Data
         {
             try
             {
-                var loaded = await SaveManager.LoadMembersAsync<TestSaveData>(selectedFormat);
+                var loaded = await Framework.GetModule<IPersistent>().LoadMembersAsync<TestSaveData>(serializer: GetSerializer(selectedFormat));
                 if (loaded != null)
                 {
                     data = loaded;

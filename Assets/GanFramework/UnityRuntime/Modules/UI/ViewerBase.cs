@@ -1,4 +1,5 @@
 using System;
+using GanFramework.Core;
 using GanFramework.Core.EventBus;
 using GanFramework.Core.Modules.UI;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace GanFramework.Runtime.Modules.UI
         {
             gameObject.SetActive(true);
             OnOpen?.Invoke();
-            EventBus.Instance.Publish(new OpenUIEvent(this));
+            Framework.GetModule<IEventBus>().Publish(new OpenUIEvent(this));
             UIManager.Current?.UpdateCursorState();
         }
 
@@ -28,7 +29,7 @@ namespace GanFramework.Runtime.Modules.UI
         {
             gameObject.SetActive(false);
             OnClose?.Invoke();
-            EventBus.Instance.Publish(new CloseUIEvent(this));
+            Framework.GetModule<IEventBus>().Publish(new CloseUIEvent(this));
             UIManager.Current?.RecordInteractiveUIClose(this);
             UIManager.Current?.UpdateCursorState();
         }

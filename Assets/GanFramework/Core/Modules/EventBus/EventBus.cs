@@ -3,22 +3,8 @@ using System.Collections.Generic;
 
 namespace GanFramework.Core.EventBus
 {
-    public class EventBus : IModules
+    public class EventBus : IModules, IEventBus
     {
-        private static EventBus _instance;
-        public static EventBus Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new EventBus();
-                    Framework.Register(_instance);
-                }
-                return _instance;
-            }
-        }
-
         private readonly Dictionary<Type, Delegate> _handlers = new();
 
         public void Subscribe<T>(Action<T> handler) where T : IEvent
@@ -49,11 +35,7 @@ namespace GanFramework.Core.EventBus
                 (handler as Action<T>)?.Invoke(eventData);
         }
 
-        public void OnInit()
-        {
-            _instance = this;
-        }
-
+        public void OnInit() { }
         public void OnUpdate(float deltaTime) { }
         public void OnFixedUpdate(float fixedDeltaTime) { }
         public void OnLateUpdate(float deltaTime) { }
@@ -61,7 +43,6 @@ namespace GanFramework.Core.EventBus
         public void OnDestroy()
         {
             _handlers.Clear();
-            _instance = null;
         }
     }
 }
