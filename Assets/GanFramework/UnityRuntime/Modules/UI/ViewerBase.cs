@@ -26,7 +26,7 @@ namespace GanFramework.Runtime.UI
         {
             gameObject.SetActive(true);
             OnOpen?.Invoke();
-            EventBus<OpenUIEvent>.Raise(new OpenUIEvent(this));
+            EventBus.Instance.Publish(new OpenUIEvent(this));
             UIManager.Current?.UpdateCursorState();
         }
 
@@ -37,7 +37,7 @@ namespace GanFramework.Runtime.UI
         {
             gameObject.SetActive(false);
             OnClose?.Invoke();
-            EventBus<CloseUIEvent>.Raise(new CloseUIEvent(this));
+            EventBus.Instance.Publish(new CloseUIEvent(this));
             UIManager.Current?.RecordInteractiveUIClose(this);
             UIManager.Current?.UpdateCursorState();
         }
