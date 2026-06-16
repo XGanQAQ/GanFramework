@@ -18,7 +18,7 @@ namespace GanFramework.Runtime.Data.Persistent
 {
     internal static class SaveStoreUtils
     {
-        public static readonly ISerializer DefaultSerializer = new JsonNetSerializer();
+        public static readonly ISerializer DefaultSerializer = new OdinSerializer();
 
         // 根据类型获取保存路径，要求类型必须标记 [SaveClass]，并使用其 Key 作为文件名的一部分。支持传入序列化器以获取正确的文件扩展名。
         public static string GetPathForType<T>(ISerializer serializer)

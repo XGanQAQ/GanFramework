@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using GanFramework.Core;
 using GanFramework.Core.EventBus;
 using GanFramework.Core.Modules.UI;
@@ -11,11 +12,45 @@ namespace GanFramework.Runtime.Modules.UI
         [SerializeField] private string viewerName;
         public virtual string UIName => string.IsNullOrEmpty(viewerName) ? GetType().Name : viewerName;
         public UILayer Layer { get; set; } = UILayer.Normal;
+
+        private string _assetKey;
+        public string AssetKey
+        {
+            get
+            {
+                if (_assetKey == null)
+                    ResolveAttribute();
+                return _assetKey;
+            }
+        }
+
         public bool IsActive => gameObject.activeSelf;
         public bool CloseableByEscape { get; set; } = true;
 
         public event Action OnOpen;
         public event Action OnClose;
+
+        protected virtual void Awake()
+        {
+            ResolveAttribute();
+        }
+
+        /// <summary>
+        /// 读取 [Viewer] 特性，填充 Layer 和 AssetKey
+        /// </summary>
+        private void ResolveAttribute()
+        {
+            var attr = GetType().GetCustomAttribute<ViewerAttribute>();
+            if (attr != null)
+            {
+                Layer = attr.Layer;
+                _assetKey = attr.AssetKey ?? "";
+            }
+            else
+            {
+                _assetKey = "";
+            }
+        }
 
         public virtual void Open()
         {

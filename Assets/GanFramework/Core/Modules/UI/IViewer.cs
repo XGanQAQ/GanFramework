@@ -6,6 +6,7 @@ namespace GanFramework.Core.Modules.UI
     {
         string UIName { get; }
         UILayer Layer { get; }
+        string AssetKey { get; }
         bool IsActive { get; }
         bool CloseableByEscape { get; set; }
 

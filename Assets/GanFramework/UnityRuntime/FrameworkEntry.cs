@@ -2,6 +2,8 @@ using UnityEngine;
 using GanFramework.Core;
 using GanFramework.Core.EventBus;
 using GanFramework.Runtime.Data.Persistent;
+using GanFramework.UnityRuntime.Modules.Resource;
+
 
 namespace GanFramework.Runtime
 {
@@ -28,6 +30,7 @@ namespace GanFramework.Runtime
         {
             Framework.Register(new EventBus());
             Framework.Register(new PersistentService());
+            Framework.Register(new ResManager());
         }
 
         private void Update()

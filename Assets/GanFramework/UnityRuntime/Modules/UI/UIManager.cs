@@ -1,9 +1,13 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine;
 using UnityEngine.UI;
+using GanFramework.Core;
 using GanFramework.Core.Modules.UI;
 using GanFramework.Runtime.Patterns;
+using GanFramework.UnityRuntime.Modules.Resource;
 
 namespace GanFramework.Runtime.Modules.UI
 {
@@ -48,6 +52,7 @@ namespace GanFramework.Runtime.Modules.UI
         };
 
         private Dictionary<UILayer, LayerInfo> _layerRoots = new();
+        private static readonly Dictionary<string, Type> _viewerTypeCache = new();
 
         public IReadOnlyCollection<LayerInfo> layerRoots => _layerRoots.Values;
         public Dictionary<UILayer, LayerInfo> LayerRoots => _layerRoots;
@@ -58,15 +63,11 @@ namespace GanFramework.Runtime.Modules.UI
             base.Awake();
             DontDestroyOnLoad(UIRoot);
 
-            var layers = System.Enum.GetValues(typeof(UILayer));
+            var layers = Enum.GetValues(typeof(UILayer));
             foreach (UILayer layer in layers)
             {
                 CreateLayerCanvas(layer);
             }
-        }
-
-        void Start()
-        {
         }
 
         private void CreateLayerCanvas(UILayer layer)
@@ -82,6 +83,22 @@ namespace GanFramework.Runtime.Modules.UI
             _layerRoots.Add(layer, new LayerInfo { Root = layerRootObj });
         }
 
+        private ViewerBase OpenUIInternal<T>(bool show = true) where T : class, IViewer
+        {
+            string uiName = typeof(T).Name;
+            ViewerBase viewerBase = GetViewer(uiName);
+            if (viewerBase != null)
+            {
+                if (show) viewerBase.Open();
+                else viewerBase.Close();
+                UpdateCursorState();
+                return viewerBase;
+            }
+
+            var attr = typeof(T).GetCustomAttribute<ViewerAttribute>();
+            return CreateUI(uiName, attr, show);
+        }
+
         private ViewerBase OpenUIInternal(string uiName, bool show = true)
         {
             ViewerBase viewerBase = GetViewer(uiName);
@@ -93,21 +110,25 @@ namespace GanFramework.Runtime.Modules.UI
                 return viewerBase;
             }
 
-            GameObject prefab = Resources.Load<GameObject>("UI/" + uiName);
+            Type type = ResolveViewerType(uiName);
+            var attr = type?.GetCustomAttribute<ViewerAttribute>();
+            return CreateUI(uiName, attr, show);
+        }
+
+        private ViewerBase CreateUI(string uiName, ViewerAttribute attr, bool show)
+        {
+            string assetKey = (attr != null && !string.IsNullOrEmpty(attr.AssetKey))
+                ? attr.AssetKey
+                : "UI/" + uiName;
+
+            UILayer layer = attr?.Layer ?? UILayer.Normal;
+
+            GameObject prefab = ResManager.Instance?.Load<GameObject>(assetKey);
             if (prefab == null)
             {
-                Debug.LogError("[UIManager]: UI Prefab not found: " + uiName);
+                Debug.LogError("[UIManager]: UI Prefab not found: " + assetKey);
                 return null;
             }
-
-            var prefabViewerBase = prefab.GetComponent<ViewerBase>();
-            if (prefabViewerBase == null)
-            {
-                Debug.LogError("[UIManager]: UI Prefab does not have ViewerBase component: " + uiName);
-                return null;
-            }
-
-            UILayer layer = prefabViewerBase.Layer;
 
             if (!_layerRoots.TryGetValue(layer, out var layerInfo))
             {
@@ -116,7 +137,7 @@ namespace GanFramework.Runtime.Modules.UI
             }
 
             GameObject uiObj = Instantiate(prefab, layerInfo.Root.transform);
-            viewerBase = uiObj.GetComponent<ViewerBase>();
+            var viewerBase = uiObj.GetComponent<ViewerBase>();
             viewerBase.Init();
             layerInfo.UIBasesDic.TryAdd(uiName, viewerBase);
 
@@ -135,7 +156,7 @@ namespace GanFramework.Runtime.Modules.UI
 
         public T OpenUI<T>(bool show = true) where T : class, IViewer
         {
-            return OpenUIInternal(typeof(T).Name, show) as T;
+            return OpenUIInternal<T>(show) as T;
         }
 
         public IViewer OpenUI(string viewerName, bool show = true)
@@ -223,6 +244,27 @@ namespace GanFramework.Runtime.Modules.UI
             bool shouldLockCursor = IsShouldLockCursor();
             Cursor.lockState = shouldLockCursor ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !shouldLockCursor;
+        }
+
+        private static Type ResolveViewerType(string uiName)
+        {
+            if (_viewerTypeCache.TryGetValue(uiName, out var cached))
+                return cached;
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.Name == uiName && typeof(IViewer).IsAssignableFrom(type) && !type.IsAbstract)
+                    {
+                        _viewerTypeCache[uiName] = type;
+                        return type;
+                    }
+                }
+            }
+
+            _viewerTypeCache[uiName] = null;
+            return null;
         }
     }
 }

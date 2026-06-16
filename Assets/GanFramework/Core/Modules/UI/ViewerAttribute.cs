@@ -6,12 +6,12 @@ namespace GanFramework.Core.Modules.UI
     public class ViewerAttribute : Attribute
     {
         public UILayer Layer { get; }
-        public string ResourcePath { get; }
+        public string AssetKey { get; }
 
-        public ViewerAttribute(UILayer layer = UILayer.Normal, string resourcePath = "UI")
+        public ViewerAttribute(UILayer layer = UILayer.Normal, string assetKey = "")
         {
             Layer = layer;
-            ResourcePath = resourcePath;
+            AssetKey = assetKey;
         }
     }
 }
