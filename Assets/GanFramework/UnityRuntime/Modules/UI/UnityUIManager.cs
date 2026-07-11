@@ -8,12 +8,7 @@ namespace GanFramework.UnityRuntime.UI
 {
     public class UnityUIManager : UIManager
     {
-        public class LayerInfo
-        {
-            public GameObject Root { get; set; }
-        }
-
-        private readonly Dictionary<UILayer, LayerInfo> _layerRoots = new();
+        private readonly Dictionary<UILayer, GameObject> _layerRoots = new();
         private GameObject _uiRoot;
 
         public UnityUIManager(HashSet<UILayer> unLockedCursorLayers, bool isNeedAutoLockCursor = true)
@@ -28,10 +23,10 @@ namespace GanFramework.UnityRuntime.UI
 
         public override void OnDestroy()
         {
-            foreach (var layerInfo in _layerRoots.Values)
+            foreach (var layerRoot in _layerRoots.Values)
             {
-                if (layerInfo?.Root != null)
-                    Object.Destroy(layerInfo.Root);
+                if (layerRoot != null)
+                    Object.Destroy(layerRoot);
             }
 
             _layerRoots.Clear();
@@ -54,13 +49,13 @@ namespace GanFramework.UnityRuntime.UI
                 return null;
             }
 
-            if (!_layerRoots.TryGetValue(layer, out var layerInfo))
+            if (!_layerRoots.TryGetValue(layer, out var layerRoot))
             {
                 Debug.LogError("[UnityUIManager]: Layer " + layer + " has not been initialized.");
                 return null;
             }
 
-            GameObject uiObj = Object.Instantiate(prefab, layerInfo.Root.transform);
+            GameObject uiObj = Object.Instantiate(prefab, layerRoot.transform);
             var viewer = uiObj.GetComponent<UIViewer>();
             if (viewer == null)
             {
@@ -104,7 +99,7 @@ namespace GanFramework.UnityRuntime.UI
                 layerRootObj.AddComponent<CanvasScaler>();
                 layerRootObj.AddComponent<CanvasRenderer>();
                 layerRootObj.AddComponent<GraphicRaycaster>();
-                _layerRoots[layer] = new LayerInfo { Root = layerRootObj };
+                _layerRoots[layer] = layerRootObj;
             }
         }
 
