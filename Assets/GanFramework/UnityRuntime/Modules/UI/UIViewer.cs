@@ -1,12 +1,10 @@
 using System;
 using System.Reflection;
-using GanFramework.Core;
-using GanFramework.Core.UI;
 using UnityEngine;
 
-namespace GanFramework.UnityRuntime.UI
+namespace GanFramework.Core.UI
 {
-    public abstract class ViewerBase : MonoBehaviour, IViewer
+    public abstract class UIViewer : MonoBehaviour, IViewer
     {
         [SerializeField] private string viewerName;
         public virtual string UIName => string.IsNullOrEmpty(viewerName) ? GetType().Name : viewerName;
@@ -28,6 +26,8 @@ namespace GanFramework.UnityRuntime.UI
 
         public event Action OnOpen;
         public event Action OnClose;
+
+        private IUIManager uIManager => Framework.GetModule<IUIManager>() ?? null;
 
         protected virtual void Awake()
         {
@@ -63,7 +63,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Open: {GetType().Name}");
             }
-            UIManager.Instance?.UpdateCursorState();
+            uIManager?.UpdateCursorState();
         }
 
         public virtual void Close()
@@ -78,8 +78,8 @@ namespace GanFramework.UnityRuntime.UI
             {
                 Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Close: {GetType().Name}");
             }
-            UIManager.Instance?.RecordInteractiveUIClose(this);
-            UIManager.Instance?.UpdateCursorState();
+            uIManager?.RecordInteractiveUIClose(this);
+            uIManager?.UpdateCursorState();
         }
 
         public virtual void Init()

@@ -11,7 +11,7 @@ using GanFramework.Core.Resource;
 
 namespace GanFramework.UnityRuntime.UI
 {
-    public class UIManager : IUIManager, IModules
+    public partial class UIManager : IUIManager
     {
         private static UIManager _instance;
         public static UIManager Instance => _instance;
@@ -21,7 +21,7 @@ namespace GanFramework.UnityRuntime.UI
         public class LayerInfo
         {
             public GameObject Root { get; set; }
-            public Dictionary<string, ViewerBase> UIBasesDic { get; } = new();
+            public Dictionary<string, IViewer> UIBasesDic { get; } = new();
             public bool IsHasUIActive => UIBasesDic.Values.Any(ui => ui.IsActive);
         }
 
@@ -103,7 +103,7 @@ namespace GanFramework.UnityRuntime.UI
         public void CloseUI<T>() where T : class, IViewer
         {
             string uiName = typeof(T).Name;
-            ViewerBase viewer = GetViewer(uiName);
+            IViewer viewer = GetViewer(uiName);
             if (viewer != null)
             {
                 viewer.Close();
@@ -113,7 +113,7 @@ namespace GanFramework.UnityRuntime.UI
 
         public void CloseUI(string viewerName)
         {
-            ViewerBase viewer = GetViewer(viewerName);
+            IViewer viewer = GetViewer(viewerName);
             if (viewer != null)
             {
                 viewer.Close();
@@ -122,11 +122,11 @@ namespace GanFramework.UnityRuntime.UI
         }
         #endregion
 
-        private ViewerBase GetViewer(string viewerName)
+        private IViewer GetViewer(string viewerName)
         {
             foreach (var layerRoot in _layerRoots.Values)
             {
-                if (layerRoot.UIBasesDic.TryGetValue(viewerName, out ViewerBase existingUI))
+                if (layerRoot.UIBasesDic.TryGetValue(viewerName, out IViewer existingUI))
                     return existingUI;
             }
             return null;
@@ -168,7 +168,7 @@ namespace GanFramework.UnityRuntime.UI
             return closedAny;
         }
 
-        public void RecordInteractiveUIClose(ViewerBase viewer)
+        public void RecordInteractiveUIClose(IViewer viewer)
         {
             if (viewer == null) return;
             if (viewer.Layer != UILayer.Popup && viewer.Layer != UILayer.Top) return;
@@ -208,10 +208,10 @@ namespace GanFramework.UnityRuntime.UI
             eventSystemObj.AddComponent<StandaloneInputModule>();
         }
 
-        private ViewerBase OpenUIInternal<T>(bool show = true) where T : class, IViewer
+        private IViewer OpenUIInternal<T>(bool show = true) where T : class, IViewer
         {
             string uiName = typeof(T).Name;
-            ViewerBase viewerBase = GetViewer(uiName);
+            IViewer viewerBase = GetViewer(uiName);
             if (viewerBase != null)
             {
                 if (show) viewerBase.Open();
@@ -224,9 +224,9 @@ namespace GanFramework.UnityRuntime.UI
             return CreateUI(uiName, attr, show);
         }
 
-        private ViewerBase OpenUIInternal(string uiName, bool show = true)
+        private IViewer OpenUIInternal(string uiName, bool show = true)
         {
-            ViewerBase viewerBase = GetViewer(uiName);
+            IViewer viewerBase = GetViewer(uiName);
             if (viewerBase != null)
             {
                 if (show) viewerBase.Open();
@@ -240,7 +240,7 @@ namespace GanFramework.UnityRuntime.UI
             return CreateUI(uiName, attr, show);
         }
 
-        private ViewerBase CreateUI(string uiName, ViewerAttribute attr, bool show)
+        private UIViewer CreateUI(string uiName, ViewerAttribute attr, bool show)
         {
             string assetKey = (attr != null && !string.IsNullOrEmpty(attr.AssetKey))
                 ? attr.AssetKey
@@ -262,7 +262,7 @@ namespace GanFramework.UnityRuntime.UI
             }
 
             GameObject uiObj = UnityEngine.Object.Instantiate(prefab, layerInfo.Root.transform);
-            var viewerBase = uiObj.GetComponent<ViewerBase>();
+            var viewerBase = uiObj.GetComponent<UIViewer>();
             viewerBase.Init();
             layerInfo.UIBasesDic.TryAdd(uiName, viewerBase);
 
@@ -299,46 +299,5 @@ namespace GanFramework.UnityRuntime.UI
             _viewerTypeCache[uiName] = null;
             return null;
         }
-
-        #region IModules Implementation
-        public void OnInit()
-        {
-
-        }
-
-        public void OnUpdate(float deltaTime)
-        {
-        }
-
-        public void OnFixedUpdate(float fixedDeltaTime)
-        {
-        }
-
-        public void OnLateUpdate(float deltaTime)
-        {
-        }
-
-        public void OnDestroy()
-        {
-            foreach (var layerInfo in _layerRoots.Values)
-            {
-                if (layerInfo?.Root != null)
-                    UnityEngine.Object.Destroy(layerInfo.Root);
-            }
-
-            _layerRoots.Clear();
-
-            if (UIRoot != null)
-            {
-                UnityEngine.Object.Destroy(UIRoot);
-                UIRoot = null;
-            }
-
-            if (ReferenceEquals(_instance, this))
-                _instance = null;
-        }
-
     }
-
-        #endregion
 }
