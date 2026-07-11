@@ -33,7 +33,7 @@ namespace GanFramework.UnityRuntime
             Framework.Register(new PersistentService());
             Framework.Register(new ResManager());
             
-            var uiManager = new UIManager(new HashSet<UILayer>() { UILayer.Popup, UILayer.Top });
+            var uiManager = new UnityUIManager(new HashSet<UILayer>() { UILayer.Popup, UILayer.Top });
             Framework.Register(uiManager);
         }
 

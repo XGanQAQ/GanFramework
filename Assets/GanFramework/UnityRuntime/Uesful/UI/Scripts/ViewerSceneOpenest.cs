@@ -1,11 +1,20 @@
 using UnityEngine;
-using GanFramework.UnityRuntime.UI;
-using System;
+using GanFramework.Core;
+using GanFramework.Core.UI;
+
 public class ViewerSceneOpenest : MonoBehaviour
 {
     public string ViewerName = "MainMenuViewer";
+
     void Start()
     {
-        UIManager.Instance.OpenUI(ViewerName);
+        var uiManager = Framework.GetModule<IUIManager>();
+        if (uiManager == null)
+        {
+            Debug.LogError("[ViewerSceneOpenest]: IUIManager module is not registered.");
+            return;
+        }
+
+        uiManager.OpenUI(ViewerName);
     }
 }
