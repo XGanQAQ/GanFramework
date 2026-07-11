@@ -1,4 +1,4 @@
-namespace GanFramework.Core.Modules.UI
+namespace GanFramework.Modules.UI
 {
     public interface IInitializable
     {

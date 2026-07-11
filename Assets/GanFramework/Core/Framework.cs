@@ -22,6 +22,21 @@ namespace GanFramework.Core
                 module.OnInit();
         }
 
+        public static void Register<T>() where T : IModules, new()
+        {
+            var module = new T();
+            Register(module);
+        }
+
+        public static void Unregister<T>(T module) where T : IModules
+        {
+            if (module == null)
+                throw new ArgumentNullException(nameof(module));
+
+            if (modules.Remove(module))
+                module.OnDestroy();
+        }
+
         public static void Unregister<T>() where T : IModules
         {
             for (int i = modules.Count - 1; i >= 0; i--)

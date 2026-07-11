@@ -1,4 +1,4 @@
-namespace GanFramework.Core.Modules.UI
+namespace GanFramework.Modules.UI
 {
     /// <summary>
     /// UI层级定义，数值越小越靠后渲染

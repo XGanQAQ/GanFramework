@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-#if USE_ADDRESSABLES
+#if ENABLE_ADDRESSABLES || ADDRESSABLES
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
@@ -25,7 +25,7 @@ namespace GanFramework.UnityRuntime.Modules.Resource
 
             if (!useResourcesOnly)
             {
-#if USE_ADDRESSABLES
+#if ENABLE_ADDRESSABLES || ADDRESSABLES
                 var handle = Addressables.LoadAssetAsync<T>(key);
                 asset = handle.WaitForCompletion();
                 if (handle.Status != AsyncOperationStatus.Succeeded)
@@ -53,7 +53,7 @@ namespace GanFramework.UnityRuntime.Modules.Resource
 
             if (!useResourcesOnly)
             {
-#if USE_ADDRESSABLES
+#if ENABLE_ADDRESSABLES || ADDRESSABLES
                 var handle = Addressables.LoadAssetAsync<T>(key);
                 await handle.ToUniTask();
                 if (handle.Status == AsyncOperationStatus.Succeeded)

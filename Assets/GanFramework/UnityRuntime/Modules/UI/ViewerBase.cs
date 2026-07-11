@@ -1,11 +1,11 @@
 using System;
 using System.Reflection;
 using GanFramework.Core;
-using GanFramework.Core.EventBus;
-using GanFramework.Core.Modules.UI;
+using GanFramework.Modules.EventBus;
+using GanFramework.Modules.UI;
 using UnityEngine;
 
-namespace GanFramework.Runtime.Modules.UI
+namespace GanFramework.Modules.UI
 {
     public abstract class ViewerBase : MonoBehaviour, IViewer
     {
@@ -56,17 +56,31 @@ namespace GanFramework.Runtime.Modules.UI
         {
             gameObject.SetActive(true);
             OnOpen?.Invoke();
-            Framework.GetModule<IEventBus>().Publish(new OpenUIEvent(this));
-            UIManager.Current?.UpdateCursorState();
+            if (Framework.TryGetModule<IEventBus>(out var eventBus))
+            {
+                eventBus.Publish(new OpenUIEvent(this));
+            }
+            else
+            {
+                Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Open: {GetType().Name}");
+            }
+            UIManager.Instance?.UpdateCursorState();
         }
 
         public virtual void Close()
         {
             gameObject.SetActive(false);
             OnClose?.Invoke();
-            Framework.GetModule<IEventBus>().Publish(new CloseUIEvent(this));
-            UIManager.Current?.RecordInteractiveUIClose(this);
-            UIManager.Current?.UpdateCursorState();
+            if (Framework.TryGetModule<IEventBus>(out var eventBus))
+            {
+                eventBus.Publish(new CloseUIEvent(this));
+            }
+            else
+            {
+                Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Close: {GetType().Name}");
+            }
+            UIManager.Instance?.RecordInteractiveUIClose(this);
+            UIManager.Instance?.UpdateCursorState();
         }
 
         public virtual void Init()

@@ -1,6 +1,6 @@
-using GanFramework.Core.EventBus;
+using GanFramework.Modules.EventBus;
 
-namespace GanFramework.Core.Modules.UI
+namespace GanFramework.Modules.UI
 {
     public class CloseUIEvent : IEvent
     {

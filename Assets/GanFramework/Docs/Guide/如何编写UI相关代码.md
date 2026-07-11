@@ -200,6 +200,10 @@ EventBus<OpenArmoryUI>.Raise(new OpenArmoryUI { ... });
 // Presenter 侧（自动接收事件并打开对应 Viewer）
 ```
 
+### 方式三：通过 OpenViewerButton 组件（适合 Inspector 配置）
+
+在 Button 上挂载 `OpenViewerButton` 组件，在 Inspector 中拖拽指定要打开的 `ViewerBase`。
+
 ## 关闭 UI 的方式
 
 ```csharp

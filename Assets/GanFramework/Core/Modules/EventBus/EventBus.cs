@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GanFramework.Core;
 
-namespace GanFramework.Core.EventBus
+namespace GanFramework.Modules.EventBus
 {
     public class EventBus : IModules, IEventBus
     {
@@ -44,5 +45,35 @@ namespace GanFramework.Core.EventBus
         {
             _handlers.Clear();
         }
+
+        // Unsubscribe all handlers associated with a specific subscriber object.
+        public void UnsubscribeAll(object subscriber)
+        {
+            if (subscriber == null)
+                throw new ArgumentNullException(nameof(subscriber));
+
+            var eventTypes = new List<Type>(_handlers.Keys);
+            foreach (var eventType in eventTypes)
+            {
+                var existing = _handlers[eventType];
+                Delegate rebuilt = null;
+
+                foreach (var invocation in existing.GetInvocationList())
+                {
+                    if (invocation.Target == subscriber)
+                        continue;
+
+                    rebuilt = rebuilt == null
+                        ? invocation
+                        : Delegate.Combine(rebuilt, invocation);
+                }
+
+                if (rebuilt == null)
+                    _handlers.Remove(eventType);
+                else
+                    _handlers[eventType] = rebuilt;
+            }
+        }
+
     }
 }

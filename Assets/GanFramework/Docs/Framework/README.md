@@ -24,8 +24,6 @@
 | [Persistent](Persistent.md) | `IPersistent`, `ISerializer` | `PersistentService`, `SaveStore`, `OdinSerializer` 等 | Core + Runtime |
 | [ResManager](ResManager.md) | `IResManager` | `ResManager` | Core + Runtime |
 | [Environment](Environment.md) | — | `Environment`, `EnvironmentState` | Core |
-| [Log](Log.md) | `ILogger`, `ILogHandler` | `UnityLogger`, `UnityLogHandler` | Core + Runtime |
-| [Scene](Modules/Scene/Scene.md) | `ISceneManager` | `SceneManagerModule` | Core + Runtime |
 | [Editor Tools](EditorTools.md) | — | `SaveTestWindow`, `AutoColliderFitter` | Editor |
 
 ## 快速开始

@@ -1,10 +1,10 @@
 using UnityEngine;
 using GanFramework.Core;
-using GanFramework.Core.EventBus;
+using GanFramework.Modules.EventBus;
 using GanFramework.Runtime.Data.Persistent;
-using GanFramework.Runtime.Modules.Log;
-using GanFramework.Runtime.Modules.Scene;
 using GanFramework.UnityRuntime.Modules.Resource;
+using GanFramework.Modules.UI;
+using System.Collections.Generic;
 
 
 namespace GanFramework.Runtime
@@ -33,8 +33,10 @@ namespace GanFramework.Runtime
             Framework.Register(new EventBus());
             Framework.Register(new PersistentService());
             Framework.Register(new ResManager());
-            Framework.Register(new UnityLogger());
-            Framework.Register(new SceneManagerModule());
+            
+            var uiManager = new UIManager(false);
+            uiManager.UnLockedCursorLayers = new HashSet<UILayer>() { UILayer.Popup, UILayer.Top };
+            Framework.Register(uiManager);
         }
 
         private void Update()
