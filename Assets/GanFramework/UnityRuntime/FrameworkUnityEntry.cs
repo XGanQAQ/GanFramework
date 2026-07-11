@@ -1,7 +1,6 @@
 using UnityEngine;
 using GanFramework.Core;
 using GanFramework.Core.UI;
-using GanFramework.UnityRuntime.Persistent;
 using GanFramework.UnityRuntime.UI;
 using System.Collections.Generic;
 
@@ -23,7 +22,6 @@ namespace GanFramework.UnityRuntime
             instance = go.AddComponent<FrameworkUnityEntry>();
 
             // Register modules
-            Framework.Register(new PersistentService());
             var uiManager = new UnityUIManager(new HashSet<UILayer>() { UILayer.Popup, UILayer.Top });
             Framework.Register(uiManager);
 
