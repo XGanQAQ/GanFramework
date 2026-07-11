@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GanFramework.Core.Patterns
+namespace GanFramework.Core
 {
     /// <summary>
     /// Locator 基类，支持父级查找机制。

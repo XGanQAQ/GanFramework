@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace GanFramework.Core.Patterns
+namespace GanFramework.Core
 {
     /// <summary>
     /// 不继承Mono的单例模式基类 继承该基类的类可实现单例模式 但要求有私有的无参构造函数

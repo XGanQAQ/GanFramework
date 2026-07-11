@@ -4,6 +4,11 @@ Unity 2022.3.62f3c1 (URP 14.0.12) 个人游戏框架。
 C# 9.0, netstandard2.1。
 IDE: VSCode + Unity 扩展。
 
+## 设计理念
+
+我希望在此项目中实现一个轻量级、可扩展的游戏框架，提供基础设施和工具，帮助开发者快速构建游戏。
+此项目的代码需要保持简洁、可读性高，并且易于维护。
+
 ## 程序集布局
 
 所有代码位于 `Assets/GanFramework/`。三个 asmdef 程序集：
@@ -37,6 +42,8 @@ interface IModules {
 ```
 
 **不要**在模块内部通过 `Instance` 属性惰性注册——模块应当由外部统一注册到 Framework 中，通过 `Framework.GetModule<T>()` 获取。如需单例，继承 `Singleton<T>`（非Mono）或 `GlobalMonoSingleton<T>` / `SceneSingleton<T>`（Mono）。
+
+模块与模块之间不应直接依赖。模块间通信应通过事件或 `Framework.GetModule<T>()` 获取接口。
 
 ## 插件（在 `Plugins/` 中内置）
 

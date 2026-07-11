@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GanFramework.Core.Patterns
+namespace GanFramework.Core
 {
     /// <summary>
     /// 对象池基类，适用于任意类型对象的池化管理。

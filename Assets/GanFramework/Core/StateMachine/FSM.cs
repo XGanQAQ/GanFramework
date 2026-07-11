@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace GanFramework.Core.StateMachine
+namespace GanFramework.Core
 {
     public class FSM<T> where T : IFSMState
     {
