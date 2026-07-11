@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Linq;
+using UnityEngine;
 using GanFramework.Core;
 using GanFramework.Core.UI;
 
@@ -27,12 +29,29 @@ namespace GanFramework.UnityRuntime.UI
 
         public static void CloseLayerUI(this IUIManager uiManager, UILayer layer)
         {
-            uiManager.CloseLayerUI(layer);
+            var targets = uiManager.GetLayerViewers(layer)
+                .Where(kv => kv.Value != null && kv.Value.IsActive)
+                .Select(kv => kv.Key)
+                .ToArray();
+
+            foreach (var viewerName in targets)
+            {
+                uiManager.CloseUI(viewerName);
+            }
         }
 
         public static bool TryCloseLayerUIByEscape(this IUIManager uiManager, UILayer layer)
         {
-            return uiManager.TryCloseLayerUIByEscape(layer);
+            var target = uiManager.GetLayerViewers(layer)
+                .Where(kv => kv.Value != null && kv.Value.IsActive && kv.Value.CloseableByEscape)
+                .OrderByDescending(kv => (kv.Value as Component)?.transform.GetSiblingIndex() ?? int.MinValue)
+                .FirstOrDefault();
+
+            if (target.Value == null)
+                return false;
+
+            uiManager.CloseUI(target.Key);
+            return true;
         }
     }
 }

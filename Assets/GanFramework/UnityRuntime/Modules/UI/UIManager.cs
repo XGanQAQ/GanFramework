@@ -91,41 +91,12 @@ namespace GanFramework.UnityRuntime.UI
             _cursorController.UpdateCursorState();
         }
 
-        public void CloseLayerUI(UILayer layer)
+        public IEnumerable<KeyValuePair<string, IViewer>> GetLayerViewers(UILayer layer)
         {
             if (!_layerRoots.TryGetValue(layer, out var layerInfo) || layerInfo == null)
-                return;
+                return Array.Empty<KeyValuePair<string, IViewer>>();
 
-            bool hasClosed = false;
-            foreach (var viewer in layerInfo.UIBasesDic.Values)
-            {
-                if (viewer != null && viewer.IsActive)
-                {
-                    viewer.Close();
-                    hasClosed = true;
-                }
-            }
-
-            if (hasClosed)
-                _cursorController.UpdateCursorState();
-        }
-
-        public bool TryCloseLayerUIByEscape(UILayer layer)
-        {
-            if (!_layerRoots.TryGetValue(layer, out var layerInfo) || layerInfo == null)
-                return false;
-
-            var target = layerInfo.UIBasesDic.Values
-                .Where(viewer => viewer != null && viewer.IsActive && viewer.CloseableByEscape)
-                .OrderByDescending(viewer => (viewer as Component)?.transform.GetSiblingIndex() ?? int.MinValue)
-                .FirstOrDefault();
-
-            if (target == null)
-                return false;
-
-            target.Close();
-            _cursorController.UpdateCursorState();
-            return true;
+            return layerInfo.UIBasesDic;
         }
 
         private IViewer GetViewer(string viewerName)

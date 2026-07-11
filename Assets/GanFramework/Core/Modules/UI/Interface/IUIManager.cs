@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace GanFramework.Core.UI
 {
     public interface IUIManager
@@ -6,7 +8,6 @@ namespace GanFramework.Core.UI
         bool IsUIActive<T>() where T : class, IViewer;
         IViewer OpenUI(string viewerName, bool show = true);
         void CloseUI(string viewerName);
-        void CloseLayerUI(UILayer layer);
-        bool TryCloseLayerUIByEscape(UILayer layer);
+        IEnumerable<KeyValuePair<string, IViewer>> GetLayerViewers(UILayer layer);
     }
 }
