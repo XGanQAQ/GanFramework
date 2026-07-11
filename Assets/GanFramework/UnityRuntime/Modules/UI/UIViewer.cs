@@ -63,7 +63,6 @@ namespace GanFramework.Core.UI
             {
                 Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Open: {GetType().Name}");
             }
-            uIManager?.UpdateCursorState();
         }
 
         public virtual void Close()
@@ -79,7 +78,6 @@ namespace GanFramework.Core.UI
                 Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Close: {GetType().Name}");
             }
             uIManager?.RecordInteractiveUIClose(this);
-            uIManager?.UpdateCursorState();
         }
 
         public virtual void Init()

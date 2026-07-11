@@ -16,6 +16,8 @@ namespace GanFramework.UnityRuntime.UI
         private static UIManager _instance;
         public static UIManager Instance => _instance;
 
+        private ICursorController _cursorController;
+
         public GameObject UIRoot;
 
         public class LayerInfo
@@ -24,19 +26,6 @@ namespace GanFramework.UnityRuntime.UI
             public Dictionary<string, IViewer> UIBasesDic { get; } = new();
             public bool IsHasUIActive => UIBasesDic.Values.Any(ui => ui.IsActive);
         }
-
-        public bool IsShouldLockCursor()
-        {
-            if (IsNeedAutoLockCursor == false)
-                return false;
-            foreach (var layer in UnLockedCursorLayers)
-            {
-                if (IsLayerHasUIActive(layer))
-                    return false;
-            }
-            return true;
-        }
-
         public bool IsLayerHasUIActive(UILayer layer)
         {
             return _layerRoots.TryGetValue(layer, out var layerRoot) && layerRoot.IsHasUIActive;
@@ -48,10 +37,6 @@ namespace GanFramework.UnityRuntime.UI
             var viewerBase = GetViewer(uiName);
             return viewerBase != null && viewerBase.IsActive;
         }
-
-        // 控制在什么UILayer存在UI的情况下不锁定鼠标
-        public HashSet<UILayer> UnLockedCursorLayers;
-        public bool IsNeedAutoLockCursor = true;
         private Dictionary<UILayer, LayerInfo> _layerRoots = new();
         private static readonly Dictionary<string, Type> _viewerTypeCache = new();
 
@@ -59,10 +44,9 @@ namespace GanFramework.UnityRuntime.UI
         public Dictionary<UILayer, LayerInfo> LayerRoots => _layerRoots;
         public float LastInteractiveUICloseTime { get; private set; } = -100f;
 
-        public UIManager(bool isNeedAutoLockCursor = true)
+        public UIManager(HashSet<UILayer> unLockedCursorLayers, bool isNeedAutoLockCursor = true)
         {
             _instance = this;
-            IsNeedAutoLockCursor = isNeedAutoLockCursor;
 
             if (UIRoot == null)
             {
@@ -78,14 +62,9 @@ namespace GanFramework.UnityRuntime.UI
             }
 
             EnsureEventSystem();
-
-            UnLockedCursorLayers = new HashSet<UILayer>
-            {
-                UILayer.Popup,
-                UILayer.Top
-            };
-
-            UpdateCursorState();
+    
+            _cursorController = new CursorController(this, unLockedCursorLayers, isNeedAutoLockCursor);
+            _cursorController.UpdateCursorState();
         }
 
         #region IUIManager Implementation
@@ -108,7 +87,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 viewer.Close();
             }
-            UpdateCursorState();
+            _cursorController.UpdateCursorState();
         }
 
         public void CloseUI(string viewerName)
@@ -118,7 +97,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 viewer.Close();
             }
-            UpdateCursorState();
+            _cursorController.UpdateCursorState();
         }
         #endregion
 
@@ -147,7 +126,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 uiBase.Close();
             }
-            UpdateCursorState();
+            _cursorController.UpdateCursorState();
         }
 
         public bool TryCloseLayerUIByEscape(UILayer layer)
@@ -164,7 +143,7 @@ namespace GanFramework.UnityRuntime.UI
                 }
             }
 
-            if (closedAny) UpdateCursorState();
+            if (closedAny) _cursorController.UpdateCursorState();
             return closedAny;
         }
 
@@ -175,14 +154,6 @@ namespace GanFramework.UnityRuntime.UI
 
             LastInteractiveUICloseTime = Time.unscaledTime;
         }
-
-        public void UpdateCursorState()
-        {
-            bool shouldLockCursor = IsShouldLockCursor();
-            Cursor.lockState = shouldLockCursor ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !shouldLockCursor;
-        }
-
 
         private void CreateLayerCanvas(UILayer layer)
         {
@@ -216,7 +187,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 if (show) viewerBase.Open();
                 else viewerBase.Close();
-                UpdateCursorState();
+                _cursorController.UpdateCursorState();
                 return viewerBase;
             }
 
@@ -231,7 +202,7 @@ namespace GanFramework.UnityRuntime.UI
             {
                 if (show) viewerBase.Open();
                 else viewerBase.Close();
-                UpdateCursorState();
+                _cursorController.UpdateCursorState();
                 return viewerBase;
             }
 
@@ -275,7 +246,7 @@ namespace GanFramework.UnityRuntime.UI
 
             if (show) viewerBase.Open();
             else viewerBase.Close();
-            UpdateCursorState();
+            _cursorController.UpdateCursorState();
             return viewerBase;
         }
 
