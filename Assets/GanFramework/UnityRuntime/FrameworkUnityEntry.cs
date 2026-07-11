@@ -3,17 +3,15 @@ using GanFramework.Core;
 using GanFramework.Core.UI;
 using GanFramework.UnityRuntime.Persistent;
 using GanFramework.UnityRuntime.UI;
-using GanFramework.UnityRuntime.Resource;
 using System.Collections.Generic;
 
 
 namespace GanFramework.UnityRuntime
 {
-    public class FrameworkEntry : MonoBehaviour
+    public class FrameworkUnityEntry : MonoBehaviour
     {
-        private static FrameworkEntry instance;
-
-        public static FrameworkEntry Instance => instance;
+        private static FrameworkUnityEntry instance;
+        public static FrameworkUnityEntry Instance => instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BeforeSceneLoad()
@@ -22,19 +20,14 @@ namespace GanFramework.UnityRuntime
 
             var go = new GameObject("[FrameworkEntry]");
             DontDestroyOnLoad(go);
-            instance = go.AddComponent<FrameworkEntry>();
+            instance = go.AddComponent<FrameworkUnityEntry>();
 
-            RegisterBuiltinModules();
-            Framework.Init();
-        }
-
-        private static void RegisterBuiltinModules()
-        {
+            // Register modules
             Framework.Register(new PersistentService());
-            Framework.Register(new ResManager());
-            
             var uiManager = new UnityUIManager(new HashSet<UILayer>() { UILayer.Popup, UILayer.Top });
             Framework.Register(uiManager);
+
+            Framework.Init();
         }
 
         private void Update()
