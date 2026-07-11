@@ -1,4 +1,4 @@
-namespace GanFramework.Modules.EventBus
+namespace GanFramework.Core
 {
     public interface IEvent
     {

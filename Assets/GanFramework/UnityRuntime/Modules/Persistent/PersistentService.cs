@@ -4,7 +4,7 @@ using GanFramework.Core;
 using GanFramework.Core.Data.Persistent;
 using GanFramework.Odin.OdinSerializer;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     public enum SaveFormat
     {

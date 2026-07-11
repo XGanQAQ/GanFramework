@@ -1,4 +1,4 @@
-namespace GanFramework.Modules.UI
+namespace GanFramework.Core.UI
 {
     public interface IUIManager
     {

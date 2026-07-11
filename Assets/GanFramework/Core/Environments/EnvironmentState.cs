@@ -1,4 +1,4 @@
-namespace GanFramework.Core.Environments
+namespace GanFramework.Core
 {
     public class EnvironmentState
     {

@@ -8,11 +8,11 @@ using System.Collections;
 using GanFramework.Core;
 using GanFramework.Core.Data.Persistent;
 using GanFramework.Odin.OdinSerializer;
-using GanFramework.Runtime.Data.Persistent;
+using GanFramework.UnityRuntime.Persistent;
 using UnityEditor;
 using UnityEngine;
 
-namespace GanFramework.Editor.Data
+namespace GanFramework.Editor
 {
     public class SaveTestWindow : EditorWindow
     {

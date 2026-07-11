@@ -2,10 +2,10 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
-using GanFramework.Core.Environments;
+using GanFramework.Core;
 using Debug = UnityEngine.Debug;
 
-namespace GanFramework.Runtime.Utils
+namespace GanFramework.UnityRuntime.Utils
 {
     public static class LogUtil
     {

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using GanFramework.Core.Data.Persistent;
 
-namespace GanFramework.Editor.Data
+namespace GanFramework.Editor
 {
     // 测试用的保存数据类，标记了 [SaveClass] 和 [SaveMember] 属性以供 SaveStore 使用
     [SaveClass("testdata")]

@@ -1,11 +1,12 @@
 #if UNITY_EDITOR
-using GanFramework.Modules.UI;
+using GanFramework.Core.UI;
+using GanFramework.UnityRuntime.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GanFramework.Editor.Tools
+namespace GanFramework.Editor
 {
     public static class CreateUIRuntimeLayers
     {

@@ -14,7 +14,7 @@ using UnityEditor;
 // Add Newtonsoft JObject handling
 using Newtonsoft.Json.Linq;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     internal static class SaveStoreUtils
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GanFramework.Modules.UI
+namespace GanFramework.UnityRuntime.UI
 {
     [RequireComponent(typeof(Camera))]
     public class UICamera : MonoBehaviour

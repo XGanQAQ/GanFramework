@@ -1,6 +1,6 @@
 using System;
 
-namespace GanFramework.Modules.UI
+namespace GanFramework.Core.UI
 {
     public interface IViewer: IInitializable
     {

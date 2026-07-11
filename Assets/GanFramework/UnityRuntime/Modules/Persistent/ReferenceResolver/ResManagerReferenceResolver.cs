@@ -1,8 +1,10 @@
 using GanFramework.Core;
 using GanFramework.Odin.OdinSerializer;
+using GanFramework.Core.Resource;
 using UnityEngine;
+using GanFramework.Core.Persistent;
 
-namespace GanFramework.Runtime.Data.Persistent.ReferenceResolver
+namespace GanFramework.UnityRuntime.Persistent
 {
     /// <summary>
     /// 使用 ResManager 的外部引用解析器

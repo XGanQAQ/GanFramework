@@ -1,11 +1,10 @@
 using System;
 using System.Reflection;
 using GanFramework.Core;
-using GanFramework.Modules.EventBus;
-using GanFramework.Modules.UI;
+using GanFramework.Core.UI;
 using UnityEngine;
 
-namespace GanFramework.Modules.UI
+namespace GanFramework.UnityRuntime.UI
 {
     public abstract class ViewerBase : MonoBehaviour, IViewer
     {

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using GanFramework.Core.Data.Persistent;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     /// <summary>
     /// 异步版的 SaveStore，提供与同步版一致的功能但使用异步文件 I/O。

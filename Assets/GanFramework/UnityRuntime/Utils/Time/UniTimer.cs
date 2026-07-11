@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace GanFramework.Runtime.Utils.Time
+namespace GanFramework.UnityRuntime.Utils.Time
 {
     /// <summary>
     /// 通用计时器（正计时 / 倒计时均可）

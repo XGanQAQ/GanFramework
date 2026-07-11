@@ -1,6 +1,6 @@
 using System;
 
-namespace GanFramework.Modules.EventBus
+namespace GanFramework.Core
 {
     public interface IEventBus
     {

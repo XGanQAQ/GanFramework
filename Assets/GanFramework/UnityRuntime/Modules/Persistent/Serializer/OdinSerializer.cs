@@ -3,9 +3,8 @@ using System.IO;
 using System.Linq;
 using GanFramework.Core.Data.Persistent;
 using GanFramework.Odin.OdinSerializer;
-using GanFramework.Runtime.Data.Persistent.ReferenceResolver;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     public class OdinSerializer : ISerializer
     {

@@ -1,4 +1,4 @@
-namespace GanFramework.Runtime.Data.Persistent.ReferenceResolver
+namespace GanFramework.Core.Persistent
 {
     // 资源 GUID 接口，供 ResManagerReferenceResolver 使用
     // 推荐项目统一约定：所有可存档资源都必须实现这个接口，或者挂一个组件提供 GUID

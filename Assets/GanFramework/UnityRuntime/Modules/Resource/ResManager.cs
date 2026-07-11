@@ -6,8 +6,9 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 using GanFramework.Core;
+using GanFramework.Core.Resource;
 
-namespace GanFramework.UnityRuntime.Modules.Resource
+namespace GanFramework.UnityRuntime.Resource
 {
     public class ResManager : IModules, IResManager
     {

@@ -4,7 +4,7 @@ using GanFramework.Odin.OdinSerializer;
 using UnityEditor;
 using UnityEngine;
 
-namespace GanFramework.Runtime.Data.Persistent.ReferenceResolver
+namespace GanFramework.UnityRuntime.Persistent
 {
     public class ReferenceResolverManager
     {

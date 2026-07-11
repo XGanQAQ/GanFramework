@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GanFramework.Core;
 
-namespace GanFramework.Modules.EventBus
+namespace GanFramework.Core
 {
-    public class EventBus : IModules, IEventBus
+    public class EventBus : IEventBus
     {
         private readonly Dictionary<Type, Delegate> _handlers = new();
 
@@ -34,16 +33,6 @@ namespace GanFramework.Modules.EventBus
         {
             if (_handlers.TryGetValue(typeof(T), out var handler))
                 (handler as Action<T>)?.Invoke(eventData);
-        }
-
-        public void OnInit() { }
-        public void OnUpdate(float deltaTime) { }
-        public void OnFixedUpdate(float fixedDeltaTime) { }
-        public void OnLateUpdate(float deltaTime) { }
-
-        public void OnDestroy()
-        {
-            _handlers.Clear();
         }
 
         // Unsubscribe all handlers associated with a specific subscriber object.

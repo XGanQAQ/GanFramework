@@ -1,9 +1,9 @@
 ﻿using System;
-using GanFramework.Core.Environments;
+using GanFramework.Core;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace GanFramework.Runtime.Utils
+namespace GanFramework.UnityRuntime.Utils
 {
     /// <summary>
     /// 数学运算工具类：角度弧度、距离、是否在屏幕外等

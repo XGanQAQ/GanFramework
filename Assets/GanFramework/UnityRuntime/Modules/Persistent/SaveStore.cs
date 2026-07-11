@@ -5,7 +5,7 @@ using System.Reflection;
 using GanFramework.Core.Data.Persistent;
 using UnityEngine;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     /// <summary>
     /// 持久化数据保存管理器（已重构以支持可替换的序列化器）

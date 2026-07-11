@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace GanFramework.Editor.Tools
+namespace GanFramework.Editor
 {
     [ExecuteAlways]
     [DisallowMultipleComponent]

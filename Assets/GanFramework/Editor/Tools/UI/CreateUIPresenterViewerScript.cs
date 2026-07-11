@@ -4,7 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace GanFramework.Editor.Tools
+namespace GanFramework.Editor
 {
     public static class CreateUIPresenterViewerScript
     {

@@ -3,7 +3,7 @@ using System.Text;
 using GanFramework.Core.Data.Persistent;
 using Newtonsoft.Json;
 
-namespace GanFramework.Runtime.Data.Persistent
+namespace GanFramework.UnityRuntime.Persistent
 {
     public class JsonNetSerializer : ISerializer
     {

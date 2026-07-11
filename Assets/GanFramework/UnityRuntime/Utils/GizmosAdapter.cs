@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GanFramework.Runtime.Utils
+namespace GanFramework.UnityRuntime.Utils
 {
     /// <summary>
     /// Gizmos 适配器（Adapter）

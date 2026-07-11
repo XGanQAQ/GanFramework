@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using GanFramework.Core;
-using GanFramework.Modules.UI;
-using GanFramework.UnityRuntime.Modules.Resource;
+using GanFramework.Core.UI;
+using GanFramework.Core.Resource;
 
-namespace GanFramework.Modules.UI
+namespace GanFramework.UnityRuntime.UI
 {
     public class UIManager : IUIManager, IModules
     {
@@ -248,7 +248,7 @@ namespace GanFramework.Modules.UI
 
             UILayer layer = attr?.Layer ?? UILayer.Normal;
 
-            GameObject prefab = ResManager.Instance?.Load<GameObject>(assetKey);
+            GameObject prefab = Framework.GetModule<IResManager>()?.Load<GameObject>(assetKey);
             if (prefab == null)
             {
                 Debug.LogError("[UIManager]: UI Prefab not found: " + assetKey);

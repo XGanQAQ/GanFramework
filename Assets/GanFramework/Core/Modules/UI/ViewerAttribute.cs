@@ -1,6 +1,6 @@
 using System;
 
-namespace GanFramework.Modules.UI
+namespace GanFramework.Core.UI
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ViewerAttribute : Attribute

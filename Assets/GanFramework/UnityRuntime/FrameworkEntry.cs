@@ -1,13 +1,13 @@
 using UnityEngine;
 using GanFramework.Core;
-using GanFramework.Modules.EventBus;
-using GanFramework.Runtime.Data.Persistent;
-using GanFramework.UnityRuntime.Modules.Resource;
-using GanFramework.Modules.UI;
+using GanFramework.UnityRuntime.Persistent;
+using GanFramework.UnityRuntime.UI;
+using GanFramework.UnityRuntime.Resource;
+using GanFramework.Core.UI;
 using System.Collections.Generic;
 
 
-namespace GanFramework.Runtime
+namespace GanFramework.UnityRuntime
 {
     public class FrameworkEntry : MonoBehaviour
     {
@@ -30,7 +30,6 @@ namespace GanFramework.Runtime
 
         private static void RegisterBuiltinModules()
         {
-            Framework.Register(new EventBus());
             Framework.Register(new PersistentService());
             Framework.Register(new ResManager());
             

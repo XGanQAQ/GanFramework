@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GanFramework.Core
+namespace GanFramework.Core.Resource
 {
     public interface IResManager
     {

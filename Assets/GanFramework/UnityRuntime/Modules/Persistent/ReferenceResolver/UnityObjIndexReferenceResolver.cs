@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using GanFramework.Odin.OdinSerializer;
 
-namespace GanFramework.Runtime.Data.Persistent.ReferenceResolver
+namespace GanFramework.UnityRuntime.Persistent
 {
     public class UnityObjIndexReferenceResolver : IExternalIndexReferenceResolver
     {
