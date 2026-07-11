@@ -1,6 +1,6 @@
 using System;
 
-namespace GanFramework.Core.Data.Persistent
+namespace GanFramework.Core.Persistent
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
     public sealed class SaveMemberAttribute : Attribute

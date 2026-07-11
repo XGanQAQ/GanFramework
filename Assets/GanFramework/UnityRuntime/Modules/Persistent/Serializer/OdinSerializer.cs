@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using GanFramework.Core.Data.Persistent;
+using GanFramework.Core.Persistent;
 using GanFramework.Odin.OdinSerializer;
 
 namespace GanFramework.UnityRuntime.Persistent

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using GanFramework.Core.Data.Persistent;
+using GanFramework.Core.Persistent;
 using UnityEngine;
 
 #if UNITY_EDITOR

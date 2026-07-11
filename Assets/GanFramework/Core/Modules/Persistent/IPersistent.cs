@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace GanFramework.Core.Data.Persistent
+namespace GanFramework.Core.Persistent
 {
     public interface IPersistent
     {

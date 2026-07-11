@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
 using GanFramework.Core;
-using GanFramework.Core.Data.Persistent;
+using GanFramework.Core.Persistent;
 using GanFramework.Odin.OdinSerializer;
 using GanFramework.UnityRuntime.Persistent;
 using UnityEditor;

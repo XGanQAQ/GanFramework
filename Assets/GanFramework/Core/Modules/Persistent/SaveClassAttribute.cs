@@ -1,5 +1,5 @@
 using System;
-namespace GanFramework.Core.Data.Persistent
+namespace GanFramework.Core.Persistent
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class SaveClassAttribute : Attribute

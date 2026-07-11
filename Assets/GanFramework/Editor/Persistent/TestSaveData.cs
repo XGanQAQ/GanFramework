@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-using GanFramework.Core.Data.Persistent;
+using GanFramework.Core.Persistent;
 
 namespace GanFramework.Editor
 {

@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using GanFramework.Core.Data.Persistent;
+using GanFramework.Core.Persistent;
 using Newtonsoft.Json;
 
 namespace GanFramework.UnityRuntime.Persistent
