@@ -18,7 +18,7 @@ namespace GanFramework.UnityRuntime.UI
 
         private ICursorController _cursorController;
 
-        public GameObject UIRoot;
+        private GameObject UIRoot;
 
         public class LayerInfo
         {
@@ -26,6 +26,7 @@ namespace GanFramework.UnityRuntime.UI
             public Dictionary<string, IViewer> UIBasesDic { get; } = new();
             public bool IsHasUIActive => UIBasesDic.Values.Any(ui => ui.IsActive);
         }
+
         public bool IsLayerHasUIActive(UILayer layer)
         {
             return _layerRoots.TryGetValue(layer, out var layerRoot) && layerRoot.IsHasUIActive;
@@ -37,12 +38,9 @@ namespace GanFramework.UnityRuntime.UI
             var viewerBase = GetViewer(uiName);
             return viewerBase != null && viewerBase.IsActive;
         }
+
         private Dictionary<UILayer, LayerInfo> _layerRoots = new();
         private static readonly Dictionary<string, Type> _viewerTypeCache = new();
-
-        public IReadOnlyCollection<LayerInfo> layerRoots => _layerRoots.Values;
-        public Dictionary<UILayer, LayerInfo> LayerRoots => _layerRoots;
-        public float LastInteractiveUICloseTime { get; private set; } = -100f;
 
         public UIManager(HashSet<UILayer> unLockedCursorLayers, bool isNeedAutoLockCursor = true)
         {
@@ -62,30 +60,25 @@ namespace GanFramework.UnityRuntime.UI
             }
 
             EnsureEventSystem();
-    
+
             _cursorController = new CursorController(this, unLockedCursorLayers, isNeedAutoLockCursor);
             _cursorController.UpdateCursorState();
         }
 
-        public T OpenUI<T>(bool show = true) where T : class, IViewer
-        {
-            return OpenUIInternal<T>(show) as T;
-        }
-
         public IViewer OpenUI(string viewerName, bool show = true)
         {
-            return OpenUIInternal(viewerName, show);
-        }
-
-        public void CloseUI<T>() where T : class, IViewer
-        {
-            string uiName = typeof(T).Name;
-            IViewer viewer = GetViewer(uiName);
-            if (viewer != null)
+            IViewer viewerBase = GetViewer(viewerName);
+            if (viewerBase != null)
             {
-                viewer.Close();
+                if (show) viewerBase.Open();
+                else viewerBase.Close();
+                _cursorController.UpdateCursorState();
+                return viewerBase;
             }
-            _cursorController.UpdateCursorState();
+
+            Type type = ResolveViewerType(viewerName);
+            var attr = type?.GetCustomAttribute<ViewerAttribute>();
+            return CreateUI(viewerName, attr, show);
         }
 
         public void CloseUI(string viewerName)
@@ -98,6 +91,43 @@ namespace GanFramework.UnityRuntime.UI
             _cursorController.UpdateCursorState();
         }
 
+        public void CloseLayerUI(UILayer layer)
+        {
+            if (!_layerRoots.TryGetValue(layer, out var layerInfo) || layerInfo == null)
+                return;
+
+            bool hasClosed = false;
+            foreach (var viewer in layerInfo.UIBasesDic.Values)
+            {
+                if (viewer != null && viewer.IsActive)
+                {
+                    viewer.Close();
+                    hasClosed = true;
+                }
+            }
+
+            if (hasClosed)
+                _cursorController.UpdateCursorState();
+        }
+
+        public bool TryCloseLayerUIByEscape(UILayer layer)
+        {
+            if (!_layerRoots.TryGetValue(layer, out var layerInfo) || layerInfo == null)
+                return false;
+
+            var target = layerInfo.UIBasesDic.Values
+                .Where(viewer => viewer != null && viewer.IsActive && viewer.CloseableByEscape)
+                .OrderByDescending(viewer => (viewer as Component)?.transform.GetSiblingIndex() ?? int.MinValue)
+                .FirstOrDefault();
+
+            if (target == null)
+                return false;
+
+            target.Close();
+            _cursorController.UpdateCursorState();
+            return true;
+        }
+
         private IViewer GetViewer(string viewerName)
         {
             foreach (var layerRoot in _layerRoots.Values)
@@ -106,50 +136,6 @@ namespace GanFramework.UnityRuntime.UI
                     return existingUI;
             }
             return null;
-        }
-
-        public void SwitchUI<T>() where T : class, IViewer
-        {
-            if (IsUIActive<T>())
-                CloseUI<T>();
-            else
-                OpenUI<T>();
-        }
-
-        public void CloseLayerUI(UILayer layer)
-        {
-            if (!_layerRoots.TryGetValue(layer, out var layerInfo)) return;
-            foreach (var uiBase in layerInfo.UIBasesDic.Values)
-            {
-                uiBase.Close();
-            }
-            _cursorController.UpdateCursorState();
-        }
-
-        public bool TryCloseLayerUIByEscape(UILayer layer)
-        {
-            if (!_layerRoots.TryGetValue(layer, out var layerInfo)) return false;
-
-            bool closedAny = false;
-            foreach (var uiBase in layerInfo.UIBasesDic.Values)
-            {
-                if (uiBase.IsActive && uiBase.CloseableByEscape)
-                {
-                    uiBase.Close();
-                    closedAny = true;
-                }
-            }
-
-            if (closedAny) _cursorController.UpdateCursorState();
-            return closedAny;
-        }
-
-        public void RecordInteractiveUIClose(IViewer viewer)
-        {
-            if (viewer == null) return;
-            if (viewer.Layer != UILayer.Popup && viewer.Layer != UILayer.Top) return;
-
-            LastInteractiveUICloseTime = Time.unscaledTime;
         }
 
         private void CreateLayerCanvas(UILayer layer)
@@ -176,37 +162,6 @@ namespace GanFramework.UnityRuntime.UI
             eventSystemObj.AddComponent<StandaloneInputModule>();
         }
 
-        private IViewer OpenUIInternal<T>(bool show = true) where T : class, IViewer
-        {
-            string uiName = typeof(T).Name;
-            IViewer viewerBase = GetViewer(uiName);
-            if (viewerBase != null)
-            {
-                if (show) viewerBase.Open();
-                else viewerBase.Close();
-                _cursorController.UpdateCursorState();
-                return viewerBase;
-            }
-
-            var attr = typeof(T).GetCustomAttribute<ViewerAttribute>();
-            return CreateUI(uiName, attr, show);
-        }
-
-        private IViewer OpenUIInternal(string uiName, bool show = true)
-        {
-            IViewer viewerBase = GetViewer(uiName);
-            if (viewerBase != null)
-            {
-                if (show) viewerBase.Open();
-                else viewerBase.Close();
-                _cursorController.UpdateCursorState();
-                return viewerBase;
-            }
-
-            Type type = ResolveViewerType(uiName);
-            var attr = type?.GetCustomAttribute<ViewerAttribute>();
-            return CreateUI(uiName, attr, show);
-        }
 
         private UIViewer CreateUI(string uiName, ViewerAttribute attr, bool show)
         {

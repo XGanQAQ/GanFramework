@@ -77,7 +77,6 @@ namespace GanFramework.Core.UI
             {
                 Debug.LogWarning($"[UI][ViewerBase] IEventBus not found in Close: {GetType().Name}");
             }
-            uIManager?.RecordInteractiveUIClose(this);
         }
 
         public virtual void Init()

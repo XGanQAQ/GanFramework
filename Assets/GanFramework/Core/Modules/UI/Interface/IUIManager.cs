@@ -3,11 +3,10 @@ namespace GanFramework.Core.UI
     public interface IUIManager
     {
         bool IsLayerHasUIActive(UILayer layer);
-
-        T OpenUI<T>(bool show = true) where T : class, IViewer;
+        bool IsUIActive<T>() where T : class, IViewer;
         IViewer OpenUI(string viewerName, bool show = true);
-        void CloseUI<T>() where T : class, IViewer;
-        
-        void RecordInteractiveUIClose(IViewer viewer);
+        void CloseUI(string viewerName);
+        void CloseLayerUI(UILayer layer);
+        bool TryCloseLayerUIByEscape(UILayer layer);
     }
 }
