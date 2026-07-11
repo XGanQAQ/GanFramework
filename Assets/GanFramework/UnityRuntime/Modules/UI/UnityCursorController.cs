@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace GanFramework.UnityRuntime.UI
 {
-    public class CursorController : ICursorController
+    public class UnityCursorController : ICursorController
     {
         public HashSet<UILayer> UnLockedCursorLayers;
 
         public bool IsNeedAutoLockCursor = true;
         private IUIManager _uiManager;
 
-        public CursorController(IUIManager uiManager, HashSet<UILayer> unLockedCursorLayers, bool isNeedAutoLockCursor = true)
+        public UnityCursorController(IUIManager uiManager, HashSet<UILayer> unLockedCursorLayers, bool isNeedAutoLockCursor = true)
         {
             UnLockedCursorLayers = unLockedCursorLayers;
             IsNeedAutoLockCursor = isNeedAutoLockCursor;

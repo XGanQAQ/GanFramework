@@ -17,7 +17,7 @@ namespace GanFramework.UnityRuntime.UI
             CreateLayerCanvases();
             EnsureEventSystem();
 
-            SetCursorController(new CursorController(this, unLockedCursorLayers, isNeedAutoLockCursor));
+            SetCursorController(new UnityCursorController(this, unLockedCursorLayers, isNeedAutoLockCursor));
             CursorController.UpdateCursorState();
         }
 
