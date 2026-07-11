@@ -67,8 +67,6 @@ namespace GanFramework.UnityRuntime.UI
             _cursorController.UpdateCursorState();
         }
 
-        #region IUIManager Implementation
-
         public T OpenUI<T>(bool show = true) where T : class, IViewer
         {
             return OpenUIInternal<T>(show) as T;
@@ -99,7 +97,6 @@ namespace GanFramework.UnityRuntime.UI
             }
             _cursorController.UpdateCursorState();
         }
-        #endregion
 
         private IViewer GetViewer(string viewerName)
         {
