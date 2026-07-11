@@ -57,22 +57,22 @@ namespace GanFramework.UnityRuntime.Persistent
             SaveStore.LoadMembersInto(instance, serializer);
 
         public Task SaveAsync<T>(T data, ISerializer serializer = null) =>
-            AsyncSaveStore.SaveAsync(data, serializer);
+            SaveStoreAsync.SaveAsync(data, serializer);
 
         public Task<T> LoadAsync<T>(ISerializer serializer = null) =>
-            AsyncSaveStore.LoadAsync<T>(serializer);
+            SaveStoreAsync.LoadAsync<T>(serializer);
 
         public Task<T> LoadIntoAsync<T>(T instance, ISerializer serializer = null) =>
-            AsyncSaveStore.LoadIntoAsync(instance, serializer);
+            SaveStoreAsync.LoadIntoAsync(instance, serializer);
 
         public Task SaveMembersAsync<T>(T instance, ISerializer serializer = null) =>
-            AsyncSaveStore.SaveMembersAsync(instance, serializer);
+            SaveStoreAsync.SaveMembersAsync(instance, serializer);
 
         public Task<T> LoadMembersAsync<T>(Func<T> factory = null, ISerializer serializer = null) where T : class =>
-            AsyncSaveStore.LoadMembersAsync(factory, serializer);
+            SaveStoreAsync.LoadMembersAsync(factory, serializer);
 
         public Task LoadMembersIntoAsync<T>(T instance, ISerializer serializer = null) =>
-            AsyncSaveStore.LoadMembersIntoAsync(instance, serializer);
+            SaveStoreAsync.LoadMembersIntoAsync(instance, serializer);
 
         // SaveFormat convenience overloads
 
@@ -113,33 +113,33 @@ namespace GanFramework.UnityRuntime.Persistent
             SaveStore.LoadMembersInto(instance, serializer ?? GetSerializerForFormat(format));
 
         public Task SaveAsync<T>(T data, SaveFormat format) =>
-            AsyncSaveStore.SaveAsync(data, GetSerializerForFormat(format));
+            SaveStoreAsync.SaveAsync(data, GetSerializerForFormat(format));
 
         public Task SaveAsync<T>(T data, SaveFormat format, ISerializer serializer) =>
-            AsyncSaveStore.SaveAsync(data, serializer ?? GetSerializerForFormat(format));
+            SaveStoreAsync.SaveAsync(data, serializer ?? GetSerializerForFormat(format));
 
         public Task<T> LoadAsync<T>(SaveFormat format) =>
-            AsyncSaveStore.LoadAsync<T>(GetSerializerForFormat(format));
+            SaveStoreAsync.LoadAsync<T>(GetSerializerForFormat(format));
 
         public Task<T> LoadAsync<T>(SaveFormat format, ISerializer serializer) =>
-            AsyncSaveStore.LoadAsync<T>(serializer ?? GetSerializerForFormat(format));
+            SaveStoreAsync.LoadAsync<T>(serializer ?? GetSerializerForFormat(format));
 
         public Task SaveMembersAsync<T>(T instance, SaveFormat format) =>
-            AsyncSaveStore.SaveMembersAsync(instance, GetSerializerForFormat(format));
+            SaveStoreAsync.SaveMembersAsync(instance, GetSerializerForFormat(format));
 
         public Task SaveMembersAsync<T>(T instance, SaveFormat format, ISerializer serializer) =>
-            AsyncSaveStore.SaveMembersAsync(instance, serializer ?? GetSerializerForFormat(format));
+            SaveStoreAsync.SaveMembersAsync(instance, serializer ?? GetSerializerForFormat(format));
 
         public Task<T> LoadMembersAsync<T>(SaveFormat format, Func<T> factory = null) where T : class =>
-            AsyncSaveStore.LoadMembersAsync(factory, GetSerializerForFormat(format));
+            SaveStoreAsync.LoadMembersAsync(factory, GetSerializerForFormat(format));
 
         public Task<T> LoadMembersAsync<T>(Func<T> factory, SaveFormat format, ISerializer serializer) where T : class =>
-            AsyncSaveStore.LoadMembersAsync(factory, serializer ?? GetSerializerForFormat(format));
+            SaveStoreAsync.LoadMembersAsync(factory, serializer ?? GetSerializerForFormat(format));
 
         public Task LoadMembersIntoAsync<T>(T instance, SaveFormat format) =>
-            AsyncSaveStore.LoadMembersIntoAsync(instance, GetSerializerForFormat(format));
+            SaveStoreAsync.LoadMembersIntoAsync(instance, GetSerializerForFormat(format));
 
         public Task LoadMembersIntoAsync<T>(T instance, SaveFormat format, ISerializer serializer) =>
-            AsyncSaveStore.LoadMembersIntoAsync(instance, serializer ?? GetSerializerForFormat(format));
+            SaveStoreAsync.LoadMembersIntoAsync(instance, serializer ?? GetSerializerForFormat(format));
     }
 }

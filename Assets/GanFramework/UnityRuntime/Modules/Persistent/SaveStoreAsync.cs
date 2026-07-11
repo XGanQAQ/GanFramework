@@ -11,7 +11,7 @@ namespace GanFramework.UnityRuntime.Persistent
     /// 异步版的 SaveStore，提供与同步版一致的功能但使用异步文件 I/O。
     /// 该类现在复用 SaveStoreUtils 中的通用逻辑以避免重复代码。
     /// </summary>
-    public static class AsyncSaveStore
+    public static class SaveStoreAsync
     {
         private static readonly ISerializer DefaultSerializer = SaveStoreUtils.DefaultSerializer;
 
