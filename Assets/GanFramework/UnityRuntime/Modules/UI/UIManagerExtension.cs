@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Linq;
 using UnityEngine;
 using GanFramework.Core;
@@ -8,6 +7,17 @@ namespace GanFramework.UnityRuntime.UI
 {
     public static class IUIManagerExtension
     {
+        public static bool IsActive<T>(this IUIManager uiManager) where T : class, IViewer
+        {
+            return uiManager.IsActive(typeof(T).Name);
+        }
+
+        public static bool IsActive(this IUIManager uiManager, UILayer layer)
+        {
+            return uiManager.GetLayerViewers(layer)
+                .Any(kv => kv.Value != null && kv.Value.IsActive);
+        }
+
         public static T OpenUI<T>(this IUIManager uiManager, bool show = true) where T : class, IViewer
         {
             return uiManager.OpenUI(typeof(T).Name, show) as T;
@@ -21,7 +31,7 @@ namespace GanFramework.UnityRuntime.UI
 
         public static void SwitchUI<T>(this IUIManager uiManager) where T : class, IViewer
         {
-            if (uiManager.IsUIActive<T>())
+            if (uiManager.IsActive<T>())
                 uiManager.CloseUI<T>();
             else
                 uiManager.OpenUI<T>();

@@ -26,7 +26,7 @@ namespace GanFramework.UnityRuntime.UI
                 return false;
             foreach (var layer in UnLockedCursorLayers)
             {
-                if (_uiManager.IsLayerHasUIActive(layer))
+                if (_uiManager.IsActive(layer))
                     return false;
             }
             return true;

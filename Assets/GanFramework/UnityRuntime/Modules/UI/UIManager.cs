@@ -24,18 +24,12 @@ namespace GanFramework.UnityRuntime.UI
         {
             public GameObject Root { get; set; }
             public Dictionary<string, IViewer> UIBasesDic { get; } = new();
-            public bool IsHasUIActive => UIBasesDic.Values.Any(ui => ui.IsActive);
+            public bool HasActiveUI => UIBasesDic.Values.Any(ui => ui.IsActive);
         }
 
-        public bool IsLayerHasUIActive(UILayer layer)
+        public bool IsActive(string viewerName)
         {
-            return _layerRoots.TryGetValue(layer, out var layerRoot) && layerRoot.IsHasUIActive;
-        }
-
-        public bool IsUIActive<T>() where T : class, IViewer
-        {
-            string uiName = typeof(T).Name;
-            var viewerBase = GetViewer(uiName);
+            var viewerBase = GetViewer(viewerName);
             return viewerBase != null && viewerBase.IsActive;
         }
 
